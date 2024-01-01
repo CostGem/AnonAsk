@@ -21,7 +21,7 @@ load_dotenv(dotenv_path=dotenv_path)
 
 @dataclass
 class Config:
-    LOGGING_LEVEL: Optional[int, str] = logging.DEBUG
+    LOGGING_LEVEL: int = logging.DEBUG
     BOT: BotConfiguration = BotConfiguration()
     DATABASE: DatabaseConfiguration = DatabaseConfiguration()
     REDIS: RedisConfiguration = RedisConfiguration()
