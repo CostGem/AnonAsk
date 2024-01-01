@@ -34,7 +34,11 @@ async def main() -> None:
         pool_size=CONFIGURATION.DATABASE.pool_size,
         echo_mode=CONFIGURATION.DATABASE.echo_mode
     )
-    database_session_maker = await crud.async_session_maker(async_engine=database_engine, expire_on_commit=False)
+    database_session_maker = await crud.async_session_maker(
+        async_engine=database_engine,
+        expire_on_commit=False
+    )
+
     redis_instance = Redis(
         host=CONFIGURATION.REDIS.host,
         username=CONFIGURATION.REDIS.username,
