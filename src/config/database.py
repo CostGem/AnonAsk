@@ -56,6 +56,9 @@ class DatabaseConfiguration:
     database: Optional[DatabaseType] = DatabaseType.POSTGRESQL
     driver: Optional[DatabaseDriver] = DatabaseDriver.ASYNCPG
 
+    pool_size: int = 10
+    echo_mode: bool = True
+
     def build_connection_url(self) -> str:
         """Returns a database connection string"""
 

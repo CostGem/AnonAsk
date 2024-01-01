@@ -5,7 +5,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.base import BaseStorage
 from aiogram.fsm.storage.redis import RedisStorage
 from redis.asyncio.client import Redis
-
+from database import crud
 from config.configuration import Config
 
 
@@ -29,6 +29,12 @@ async def main() -> None:
 
     logging.basicConfig(level=CONFIGURATION.LOGGING_LEVEL)
 
+    database_engine = await crud.create_async_engine(
+        connection_url=CONFIGURATION.DATABASE.build_connection_url(),
+        pool_size=CONFIGURATION.DATABASE.pool_size,
+        echo_mode=CONFIGURATION.DATABASE.echo_mode
+    )
+    database_session_maker = await crud.async_session_maker(async_engine=database_engine, expire_on_commit=False)
     redis_instance = Redis(
         host=CONFIGURATION.REDIS.host,
         username=CONFIGURATION.REDIS.username,
@@ -49,10 +55,16 @@ async def main() -> None:
     )
     dp: Dispatcher = Dispatcher(storage=storage)
 
-    dp.startup.register(startup)
-    dp.shutdown.register(shutdown)
+    dp.startup.register(callback=startup)
+    dp.shutdown.register(callback=shutdown)
 
-    await dp.start_polling(bot, redis=redis_instance)
+    await dp.start_polling(
+        bot,
+        allowed_updates=dp.resolve_used_update_types(),
+        redis=redis_instance,
+        database_engine=database_engine,
+        database_session_maker=database_session_maker
+    )
 
 
 if __name__ == "__main__":
