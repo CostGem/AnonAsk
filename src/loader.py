@@ -3,7 +3,6 @@ from aiogram import Bot, Dispatcher, Router
 from aiogram.fsm.storage.redis import RedisStorage
 from fastapi import FastAPI
 
-from app.cache.redis_service import redis_instance
 from aiogram import Dispatcher
 from aiogram.fsm.storage.base import BaseEventIsolation, BaseStorage
 from aiogram.fsm.storage.memory import MemoryStorage
@@ -11,7 +10,8 @@ from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.fsm.strategy import FSMStrategy
 from redis.asyncio.client import Redis
 
-from src.config.configuration import CONFIGURATION, Config
+from src.cache.redis_instance import redis_instance
+from src.config import CONFIGURATION
 from src.dispatcher_actions import on_shutdown, on_startup
 from src.handlers import router
 
