@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 
 from aiogram.utils.formatting import Url
 from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker
@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import create_async_engine as _create_async_engine
 
 
 async def create_async_engine(
-        connection_url: Optional[Url, str],
+        connection_url: Optional[Union[Url, str]],
         pool_size: int,
         echo_mode: bool
 ) -> AsyncEngine:

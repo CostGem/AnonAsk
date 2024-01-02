@@ -1,13 +1,13 @@
-from dataclasses import dataclass
 import logging
-from os import getenv
-from typing import Optional, Union
+from dataclasses import dataclass
+from typing import Union
 
 
+@dataclass
 class LoggerConfiguration:
     log_path: str = "logs/logs.log"
     level: Union[str, int] = logging.ERROR
 
-    def __init__(self, IS_DEVELOPMENT: bool = False) -> None:
-        if IS_DEVELOPMENT:
+    def __init__(self, is_development: bool = False) -> None:
+        if is_development:
             self.level = logging.DEBUG
