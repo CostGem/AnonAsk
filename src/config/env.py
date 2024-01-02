@@ -1,7 +1,7 @@
 import logging
 from dataclasses import dataclass
 from os import getenv
-from typing import Optional
+from typing import Optional, Union
 
 from dotenv import load_dotenv, find_dotenv
 
@@ -17,11 +17,3 @@ else:
     dotenv_path = find_dotenv(filename=".env.local")
 
 load_dotenv(dotenv_path=dotenv_path)
-
-
-@dataclass
-class Config:
-    LOGGING_LEVEL: Optional[int, str] = logging.DEBUG
-    BOT: BotConfiguration = BotConfiguration()
-    DATABASE: DatabaseConfiguration = DatabaseConfiguration()
-    REDIS: RedisConfiguration = RedisConfiguration()
