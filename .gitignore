@@ -501,11 +501,6 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-<<<<<<< HEAD
 # Custom values
 .env.general
 .env.local
-=======
-.env.local
-.env.general
->>>>>>> origin/main
