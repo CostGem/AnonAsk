@@ -1,63 +1,66 @@
-from typing import Optional
-
+from typing import Dict, List, Tuple
 from fluent_compiler.bundle import FluentBundle
 from fluentogram import TranslatorHub, FluentTranslator, TranslatorRunner
 
-from config import LANG_CODE_LIST
-from errors.translation import InvalidTranslationKeyError
 
+FLUENT_DICTIONARIES_PATH_DICT = {
+    "ru": "src/translation/locales/ru.ftl",
+}
 
-class Translator:
-    """Translator"""
+FLUENT_TRANSLATORS: List[FluentTranslator] = [
+    FluentTranslator(
+        locale=locale,
+        translator=FluentBundle.from_files(
+            locale=locale, filenames=[FLUENT_DICTIONARIES_PATH_DICT[locale]]
+        ),
+    )
+    for locale in FLUENT_DICTIONARIES_PATH_DICT
+]
 
-    __translator_hub: TranslatorHub
-
-    def __init__(self) -> None:
-        self.__translator_hub = TranslatorHub(
-            locales_map={
-                "en": ("en", "ru"),
-                "ru": ("ru", "en"),
-            },
-            translators=[
-                FluentTranslator(
-                    locale="ru",
-                    translator=FluentBundle.from_files("ru-RU", filenames=["src/locales/locale_dicts/ru.ftl"])
-                ),
-                FluentTranslator(
-                    locale="en",
-                    translator=FluentBundle.from_files("en-US", filenames=["src/locales/locale_dicts/en.ftl"])
-                ),
-            ],
-            root_locale="en"
-        )
-
-    def __call__(self, locale_code: str, *args, **kwargs):
-        return LocalizedTranslator(
-            translator=self.__translator_hub.get_translator_by_locale(locale=locale_code),
-            locale=locale_code if locale_code in LANG_CODE_LIST else self.__translator_hub.root_locale
-        )
+FLUENT_LOCALES_MAP: Dict[str, Tuple[str]] = {
+    "ru": ("ru",),
+}
 
 
 class LocalizedTranslator:
-    """LocalizedTranslator"""
-
-    __translator: TranslatorRunner
+    translator: TranslatorRunner
     locale: str
 
-    def __init__(self, locale: str, translator: TranslatorRunner) -> None:
-        self.__translator = translator
+    def __init__(self, translator: TranslatorRunner, locale: str):
+        self.translator = translator
         self.locale = locale
 
     def get(self, key: str, **kwargs) -> str:
-        """
-        Returns a value from a language dictionary by key
-        :param key: Value key in the language dictionary
-        :return: Meaning from the language dictionary
-        """
+        return self.translator.get(key, **kwargs)
 
-        translation: Optional[str] = self.__translator.get(key, **kwargs)
 
-        if not translation:
-            raise InvalidTranslationKeyError(key=key)
+class TranslatorManager:
+    t_hub: TranslatorHub
+    translators: Dict[str, LocalizedTranslator] = {}
 
-        return translation
+    def __new__(cls):
+        if not hasattr(cls, "instance"):
+            cls.instance = super(TranslatorManager, cls).__new__(cls)
+
+        return cls.instance
+
+    def __init__(self):
+        self.t_hub = TranslatorHub(
+            locales_map=FLUENT_LOCALES_MAP,
+            translators=FLUENT_TRANSLATORS,
+            root_locale="en",
+        )
+        self.__init_translators()
+
+    def __init_translators(self) -> None:
+        """The function initializes translators for each locale using the t_hub object"""
+        for locale in self.t_hub.locales_map:
+            self.translators[locale] = LocalizedTranslator(
+                translator=self.t_hub.get_translator_by_locale(locale), locale=locale
+            )
+
+    def get_translator(self, locale: str) -> LocalizedTranslator:
+        if locale not in self.translators:
+            locale = self.t_hub.root_locale
+
+        return self.translators[locale]
