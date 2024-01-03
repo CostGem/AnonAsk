@@ -1,6 +1,8 @@
 from typing import Any, List, Union, Optional
 from redis.asyncio.client import Redis
 from termcolor import cprint
+
+from errors.redis import InvalidRedisKeyError, RedisTTLNotConfiguredError
 from src.config import CONFIGURATION
 
 
@@ -44,7 +46,7 @@ class BasicCache:
 
         if not is_cache_extension:
             if not hasattr(cls, "ttl"):
-                raise ValueError("TTL need to be preconfigured")
+                raise RedisTTLNotConfiguredError()
             else:
                 cls.__ttl = cls.ttl
 
@@ -58,14 +60,13 @@ class BasicCache:
                     "You have set the prefix, that already used in another cache class object"
                 )
             else:
-                BasicCache.__cache_prefix_list.append(cls.__prefix)
+                BasicCache.__cache_prefix_list.append(cls.prefix)
 
     async def __get_redis_key(self) -> Optional[str]:
         """Get a redis key
 
         * key can be constructed using configured item_id value
         * key can be constructed via loading cached item_id value
-            * pointer_id must be configured
 
         """
 
@@ -91,16 +92,16 @@ class BasicCache:
         :param value: The `value` parameter is a string that represents the value to be stored in the cache
         :type value: str
         """
+
         if redis_key := await self.__get_redis_key():
-            if await self.get_from_cache() != value:
+            if await self.get() != value:
                 await self.__redis.set(ex=self.__ttl, name=redis_key, value=value)
         else:
-            raise ValueError("Invalid redis_key")
+            raise InvalidRedisKeyError(key=redis_key)
 
     async def delete(self) -> None:
-        """
-        The `delete_cache_value` function deletes a value from a Redis cache and a pointer if specified.
-        """
+        """The `delete_cache_value` function deletes a value from a Redis cache and a pointer if specified"""
+
         if redis_key := await self.__get_redis_key():
-            if await self.__redis.get(redis_key):
+            if await self.__redis.get(name=redis_key):
                 await self.__redis.delete(redis_key)
