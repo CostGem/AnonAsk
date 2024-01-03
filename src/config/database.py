@@ -1,11 +1,12 @@
 from dataclasses import dataclass
 from os import getenv
 from typing import Optional
+from pydantic import BaseModel
 
 from sqlalchemy import URL
 
-from enums.database import DatabaseDriver, DatabaseType
-from errors.database import DatabaseDriverError
+from src.enums.database import DatabaseDriver, DatabaseType
+from src.errors.database import DatabaseDriverError
 
 DATABASES_DRIVERS = {
     DatabaseType.MARIADB: (
@@ -45,16 +46,15 @@ DATABASES_DRIVERS = {
 }
 
 
-@dataclass
-class DatabaseConfiguration:
-    host: Optional[str] = getenv("DATABASE_HOST")
-    username: Optional[str] = getenv("DATABASE_USERNAME")
-    password: Optional[str] = getenv("DATABASE_PASSWORD")
-    name: Optional[str] = getenv("DATABASE_NAME")
-    port: Optional[int] = int(getenv("DATABASE_PORT", 5432))
+class DatabaseConfiguration(BaseModel):
+    host: str = getenv("DATABASE_HOST")
+    username: str = getenv("DATABASE_USERNAME")
+    password: str = getenv("DATABASE_PASSWORD")
+    name: str = getenv("DATABASE_NAME")
+    port: int = int(getenv("DATABASE_PORT", 5432))
 
-    database: Optional[DatabaseType] = DatabaseType.POSTGRESQL
-    driver: Optional[DatabaseDriver] = DatabaseDriver.ASYNCPG
+    database: DatabaseType = DatabaseType.POSTGRESQL
+    driver: DatabaseDriver = DatabaseDriver.ASYNCPG
 
     pool_size: int = 10
     echo_mode: bool = True

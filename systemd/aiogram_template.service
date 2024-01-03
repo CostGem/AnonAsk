@@ -1,0 +1,15 @@
+[Unit]
+Description=<< Type there description >>
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+StandardOutput=journal
+ExecStart=/usr/bin/docker compose -f << Type there path to compose file >> -d --build
+ExecStop=/usr/bin/docker compose -f << Type there path to compose file >> down
+WorkingDirectory=<< Type there path to the project >>
+
+[Install]
+WantedBy=default.target

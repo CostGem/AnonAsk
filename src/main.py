@@ -9,6 +9,7 @@ from src.database.engine import create_session_pool, session_manager
 from src.dispatcher_actions import on_shutdown, on_startup
 from src.loader import bot, dp, webhook_server_app
 from src.config import CONFIGURATION
+from src.utils.service_tools import bot_logging
 
 
 @webhook_server_app.on_event("startup")

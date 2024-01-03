@@ -1,7 +1,7 @@
 # base image with python
 FROM python:3.11.4
 
-ENV IS_DOCKER=docker
+ENV IS_DOCKER=true
 
 RUN chmod 755 .
 

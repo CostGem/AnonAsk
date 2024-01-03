@@ -1,7 +1,5 @@
-from dataclasses import dataclass
 import logging
-from os import getenv
-from typing import Optional, Union
+from typing import Union
 
 
 class LoggerConfiguration:

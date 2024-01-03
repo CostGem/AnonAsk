@@ -17,6 +17,11 @@ from src.handlers import router
 
 
 def get_dispatcher():
+    """
+    The function `get_dispatcher` creates and configures a `Dispatcher` object for handling requests,
+    using a Redis storage backend.
+    :return: an instance of the `Dispatcher` class.
+    """
     redis_storage = RedisStorage(
         redis=redis_instance,
         state_ttl=CONFIGURATION.REDIS.state_ttl,
