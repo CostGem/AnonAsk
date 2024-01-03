@@ -8,6 +8,7 @@ from aiogram.enums import ParseMode
 
 @dataclass
 class BotConfiguration:
+    # base values
     token: Optional[str] = getenv("BOT_TOKEN")
     parse_mode: ParseMode = ParseMode.HTML
     session: Optional[BaseSession] = None

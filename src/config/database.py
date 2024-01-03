@@ -1,11 +1,12 @@
 from dataclasses import dataclass
 from os import getenv
 from typing import Optional
+from pydantic import BaseModel
 
 from sqlalchemy import URL
 
-from enums.database import DatabaseDriver, DatabaseType
-from errors.database import DatabaseDriverError
+from src.enums.database import DatabaseDriver, DatabaseType
+from src.errors.database import DatabaseDriverError
 
 DATABASES_DRIVERS = {
     DatabaseType.MARIADB: (
@@ -45,16 +46,15 @@ DATABASES_DRIVERS = {
 }
 
 
-@dataclass
-class DatabaseConfiguration:
-    host: Optional[str] = getenv("DATABASE_HOST")
-    username: Optional[str] = getenv("DATABASE_USERNAME")
-    password: Optional[str] = getenv("DATABASE_PASSWORD")
-    name: Optional[str] = getenv("DATABASE_NAME")
-    port: Optional[int] = int(getenv("DATABASE_PORT", 5432))
+class DatabaseConfiguration(BaseModel):
+    host: str = getenv("POSTGRES_HOST")
+    username: str = getenv("POSTGRES_USER")
+    password: str = getenv("POSTGRES_PASSWORD")
+    name: str = getenv("POSTGRES_DB")
+    port: int = int(getenv("POSTGRES_PORT", 5432))
 
-    database: Optional[DatabaseType] = DatabaseType.POSTGRESQL
-    driver: Optional[DatabaseDriver] = DatabaseDriver.ASYNCPG
+    database: DatabaseType = DatabaseType.POSTGRESQL
+    driver: DatabaseDriver = DatabaseDriver.ASYNCPG
 
     pool_size: int = 10
     echo_mode: bool = True
@@ -62,10 +62,10 @@ class DatabaseConfiguration:
     def build_connection_url(self) -> str:
         """Returns a database connection string"""
 
-        if self.database not in DATABASES_DRIVERS[self.database]:
+        if self.driver not in DATABASES_DRIVERS[self.database]:
             raise DatabaseDriverError(database=self.database, driver=self.driver)
 
-        return URL.create(
+        a = URL.create(
             drivername=f"{self.database}+{self.driver}",
             username=self.username,
             database=self.name,
@@ -73,3 +73,5 @@ class DatabaseConfiguration:
             port=self.port,
             host=self.host,
         ).render_as_string(hide_password=False)
+        print(a)
+        return a

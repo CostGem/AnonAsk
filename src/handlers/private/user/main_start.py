@@ -2,11 +2,13 @@ from aiogram import Router
 from aiogram.filters import CommandStart
 from aiogram.types import Message
 
+from src.language.translator import LocalizedTranslator
+
 router: Router = Router(name="main_start")
 
 
 @router.message(CommandStart())
-async def start_command(message: Message) -> None:
+async def start_command(message: Message, translator: LocalizedTranslator) -> None:
     """
     The function responds with "Hello, world" when the start command is received.
 
@@ -14,4 +16,4 @@ async def start_command(message: Message) -> None:
     from a user. It contains information such as the message text, sender, chat, and other metadata
     :type message: Message
     """
-    await message.answer("Hello, world")
+    await message.answer(translator.get("start_command_message"))

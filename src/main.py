@@ -1,78 +1,116 @@
 import asyncio
-import logging
+import time
+from typing import AsyncContextManager
 
-from aiogram import Bot, Dispatcher
-from aiogram.fsm.storage.base import BaseStorage
-from aiogram.fsm.storage.redis import RedisStorage
-from redis.asyncio.client import Redis
-from database import crud
-from config.env import Config
-
-
-async def startup(dispatcher: Dispatcher, bot: Bot) -> None:
-    """Bot startup"""
-
-    pass
+from aiogram.types import WebhookInfo, Update
+import uvicorn
+from src.cache.redis_instance import redis_instance
+from src.database.engine import create_session_pool, session_manager
+from src.dispatcher_actions import on_shutdown, on_startup
+from src.loader import bot, dp, webhook_server_app
+from src.config import CONFIGURATION
+from src.utils.service_tools import bot_logging
 
 
-async def shutdown(dispatcher: Dispatcher, bot: Bot) -> None:
-    """Bot shutdown"""
+@webhook_server_app.on_event("startup")
+async def startup():
+    """
+    The above function is an event handler that runs when the application starts up and performs various
+    tasks such as deleting any existing webhooks, setting up a new webhook, and initializing session
+    pools.
+    """
 
-    await bot.session.close()
-    await dispatcher.storage.close()
-
-
-async def main() -> None:
-    """Application startup"""
-
-    CONFIGURATION = Config()
-
-    logging.basicConfig(level=CONFIGURATION.LOGGING_LEVEL)
-
-    database_engine = await crud.create_async_engine(
-        connection_url=CONFIGURATION.DATABASE.build_connection_url(),
-        pool_size=CONFIGURATION.DATABASE.pool_size,
-        echo_mode=CONFIGURATION.DATABASE.echo_mode
-    )
-    database_session_maker = await crud.async_session_maker(
-        async_engine=database_engine,
-        expire_on_commit=False
+    webhook_info: WebhookInfo = await bot.get_webhook_info()
+    session_pool: AsyncContextManager = await create_session_pool(
+        url=CONFIGURATION.DATABASE.build_connection_url()
     )
 
-    redis_instance = Redis(
-        host=CONFIGURATION.REDIS.host,
-        username=CONFIGURATION.REDIS.username,
-        password=CONFIGURATION.REDIS.password,
-        port=CONFIGURATION.REDIS.port
-    )
-    storage: BaseStorage = RedisStorage(
+    if webhook_info.url != CONFIGURATION.BOT.webhook_url:
+        await bot.set_webhook(url=CONFIGURATION.BOT.webhook_url)
+    else:
+        await bot.delete_webhook(drop_pending_updates=True)
+        time.sleep(1)
+        await asyncio.sleep(1)
+        await bot.set_webhook(url=CONFIGURATION.BOT.webhook_url)
+
+    await on_startup(bot=bot, dispatcher=dp, session_pool=session_pool)
+
+
+@webhook_server_app.post(CONFIGURATION.BOT.webhook_endpoint)
+async def bot_webhook(update: dict):
+    """
+    The above function is a webhook endpoint in a Python application that receives updates and feeds
+    them to a bot for processing.
+
+    :param update: The `update` parameter is a dictionary that contains information about the incoming
+    update from the webhook. It typically includes details such as the message text, sender information,
+    chat ID, etc
+    :type update: dict
+    """
+    update: Update = Update.model_validate(update, context={"bot": bot})
+    session_pool: AsyncContextManager = await session_manager.get_pool()
+
+    await dp.feed_update(
+        bot,
+        update,
+        session_pool=session_pool,
         redis=redis_instance,
-        state_ttl=CONFIGURATION.REDIS.state_ttl,
-        data_ttl=CONFIGURATION.REDIS.data_ttl
     )
-    bot: Bot = Bot(
-        token=CONFIGURATION.BOT.token,
-        session=CONFIGURATION.BOT.session,
-        parse_mode=CONFIGURATION.BOT.parse_mode,
-        disable_web_page_preview=CONFIGURATION.BOT.disable_web_page_preview,
-        protect_content=CONFIGURATION.BOT.protect_content
-    )
-    dp: Dispatcher = Dispatcher(storage=storage)
 
-    dp.startup.register(callback=startup)
-    dp.shutdown.register(callback=shutdown)
+
+@webhook_server_app.on_event("shutdown")
+async def shutdown():
+    """
+    The function `shutdown` is an event handler that is triggered when the webhook server is shutting
+    down.
+    """
+    await on_shutdown(bot=bot, dispatcher=dp)
+
+
+def run_webhook() -> None:
+    """
+    The function `run_webhook` runs a webhook server with specified configurations and registers webhook
+    endpoints if wallet webhook is enabled.
+    """
+
+    uvicorn.run(
+        webhook_server_app,
+        host=CONFIGURATION.BOT.webhook_host,
+        port=CONFIGURATION.BOT.webhook_port,
+        reload=False,
+        log_level="debug" if CONFIGURATION.IS_DEVELOPMENT else "info",
+    )
+
+
+async def run_polling() -> None:
+    """
+    The function `run_polling` starts a polling process for a bot using the `dp` object and various
+    dependencies.
+    """
+
+    dp.startup.register(on_startup)
+    dp.shutdown.register(on_shutdown)
+    session_pool: AsyncContextManager = await session_manager.get_pool()
+
+    if not CONFIGURATION.IS_DEVELOPMENT:
+        await bot.delete_webhook(drop_pending_updates=True)
 
     await dp.start_polling(
         bot,
-        allowed_updates=dp.resolve_used_update_types(),
+        session_pool=session_pool,
         redis=redis_instance,
-        database_engine=database_engine,
-        database_session_maker=database_session_maker
     )
 
 
-if __name__ == "__main__":
+def start_bot() -> None:
+    """
+    The function `start_bot` runs either a webhook or polling based on the value of the `USE_WEBHOOK`
+    variable.
+    """
     try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
+        if CONFIGURATION.USE_WEBHOOK:
+            run_webhook()
+        else:
+            asyncio.run(run_polling())
+    except (KeyboardInterrupt, SystemExit, RuntimeError):
         pass

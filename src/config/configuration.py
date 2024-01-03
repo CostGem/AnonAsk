@@ -7,11 +7,10 @@ from src.config.logger import LoggerConfiguration
 from src.config.redis import RedisConfiguration
 
 
-@dataclass
 class Config:
+    USE_WEBHOOK: bool = getenv("USE_WEBHOOK") == "true"
     IS_DEVELOPMENT: bool = True
-    USE_WEBHOOK: bool = bool(getenv("USE_WEBHOOK"))
     BOT: BotConfiguration = BotConfiguration()
     DATABASE: DatabaseConfiguration = DatabaseConfiguration()
     REDIS: RedisConfiguration = RedisConfiguration()
-    LOGGER: LoggerConfiguration = LoggerConfiguration(is_development=IS_DEVELOPMENT)
+    LOGGER: LoggerConfiguration = LoggerConfiguration(is_dev=IS_DEVELOPMENT)
