@@ -1,15 +1,15 @@
 import asyncio
 import time
-from typing import AsyncContextManager
 
-from aiogram.types import WebhookInfo, Update
 import uvicorn
-from src.cache.redis_instance import redis_instance
-from src.database.engine import create_session_pool, session_manager
+from aiogram.types import WebhookInfo, Update
+from sqlalchemy.ext.asyncio import async_sessionmaker
+
+from src.cache.redis import redis_instance
+from src.config import CONFIGURATION
+from src.database.engine import session_manager
 from src.dispatcher_actions import on_shutdown, on_startup
 from src.loader import bot, dp, webhook_server_app
-from src.config import CONFIGURATION
-from src.utils.service_tools import bot_logging
 
 
 @webhook_server_app.on_event("startup")
@@ -21,19 +21,15 @@ async def startup():
     """
 
     webhook_info: WebhookInfo = await bot.get_webhook_info()
-    session_pool: AsyncContextManager = await create_session_pool(
-        url=CONFIGURATION.DATABASE.build_connection_url()
-    )
 
     if webhook_info.url != CONFIGURATION.BOT.webhook_url:
         await bot.set_webhook(url=CONFIGURATION.BOT.webhook_url)
     else:
         await bot.delete_webhook(drop_pending_updates=True)
         time.sleep(1)
-        await asyncio.sleep(1)
         await bot.set_webhook(url=CONFIGURATION.BOT.webhook_url)
 
-    await on_startup(bot=bot, dispatcher=dp, session_pool=session_pool)
+    await on_startup(bot=bot, dispatcher=dp)
 
 
 @webhook_server_app.post(CONFIGURATION.BOT.webhook_endpoint)
@@ -47,8 +43,11 @@ async def bot_webhook(update: dict):
     chat ID, etc
     :type update: dict
     """
+
     update: Update = Update.model_validate(update, context={"bot": bot})
-    session_pool: AsyncContextManager = await session_manager.get_pool()
+    session_pool: async_sessionmaker = await session_manager.get_pool(
+        url=CONFIGURATION.DATABASE.build_connection_url()
+    )
 
     await dp.feed_update(
         bot,
@@ -90,7 +89,9 @@ async def run_polling() -> None:
 
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
-    session_pool: AsyncContextManager = await session_manager.get_pool()
+    session_pool: async_sessionmaker = await session_manager.get_pool(
+        url=CONFIGURATION.DATABASE.build_connection_url()
+    )
 
     if not CONFIGURATION.IS_DEVELOPMENT:
         await bot.delete_webhook(drop_pending_updates=True)
@@ -107,6 +108,7 @@ def start_bot() -> None:
     The function `start_bot` runs either a webhook or polling based on the value of the `USE_WEBHOOK`
     variable.
     """
+
     try:
         if CONFIGURATION.USE_WEBHOOK:
             run_webhook()

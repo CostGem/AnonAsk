@@ -2,7 +2,8 @@ from typing import Any, List, Union, Optional
 from redis.asyncio.client import Redis
 from termcolor import cprint
 
-from errors.redis import InvalidRedisKeyError, RedisTTLNotConfiguredError
+from errors.redis import InvalidRedisKeyError, RedisTTLNotConfiguredError, RedisPrefixNotConfiguredError, \
+    RedisPrefixAlreadyUsedError
 from src.config import CONFIGURATION
 
 
@@ -51,14 +52,12 @@ class BasicCache:
                 cls.__ttl = cls.ttl
 
             if not hasattr(cls, "prefix"):
-                raise ValueError("Prefix is not configured")
+                raise RedisPrefixNotConfiguredError()
             else:
                 cls.__prefix = cls.prefix
 
             if cls.prefix in BasicCache.__cache_prefix_list:
-                raise ValueError(
-                    "You have set the prefix, that already used in another cache class object"
-                )
+                raise RedisPrefixAlreadyUsedError(prefix=cls.prefix)
             else:
                 BasicCache.__cache_prefix_list.append(cls.prefix)
 
@@ -86,7 +85,7 @@ class BasicCache:
 
     async def set(self, value: str) -> None:
         """
-        The function `set_cache_value` sets a value in a cache if the redis key is valid and the value is
+        Sets a value in a cache if the redis key is valid and the value is
         different from the current value in the cache.
 
         :param value: The `value` parameter is a string that represents the value to be stored in the cache
@@ -100,7 +99,7 @@ class BasicCache:
             raise InvalidRedisKeyError(key=redis_key)
 
     async def delete(self) -> None:
-        """The `delete_cache_value` function deletes a value from a Redis cache and a pointer if specified"""
+        """Delete a value from a Redis cache"""
 
         if redis_key := await self.__get_redis_key():
             if await self.__redis.get(name=redis_key):

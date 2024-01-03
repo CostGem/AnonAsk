@@ -38,7 +38,7 @@ class TranslatorManager:
     t_hub: TranslatorHub
     translators: Dict[str, LocalizedTranslator] = {}
 
-    def __new__(cls):
+    def __new__(cls) -> "TranslatorManager":
         if not hasattr(cls, "instance"):
             cls.instance = super(TranslatorManager, cls).__new__(cls)
 

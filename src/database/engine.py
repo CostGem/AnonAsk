@@ -1,22 +1,17 @@
-from typing import AsyncContextManager, Callable, Optional
+from typing import Optional
 
-from aiogram.utils.formatting import Url
-from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from src.database.models.base import BaseModel
 
 
-async def create_session_pool(
-    url: str, echo: bool = True
-) -> Callable[[], AsyncContextManager[AsyncSession]]:
+async def create_session_pool(url: str, echo: bool = True) -> async_sessionmaker:
     """
     The `create_session_pool` function creates a session pool for an async SQLAlchemy database
     connection.
 
-    :param db: The `db` parameter is a string that represents the database URL or connection string. It
-    is used to connect to the database
-    :type db: str
+    :param url:
     :param echo: The `echo` parameter is a boolean flag that determines whether or not the engine should
     log all SQL statements that are executed. If `echo` is set to `True`, the engine will log the
     statements, and if it is set to `False`, the engine will not log the statements, defaults to True
@@ -24,6 +19,7 @@ async def create_session_pool(
     :return: The function `create_session_pool` returns a callable object that, when called, returns an
     asynchronous context manager that yields an `AsyncSession` object.
     """
+
     engine: AsyncEngine = create_async_engine(
         url=url, echo=echo, future=True, _is_async=True
     )
@@ -42,7 +38,7 @@ class SessionMakerManager:
     database connection.
     """
 
-    __session_pool: Optional[Callable[[], AsyncContextManager[AsyncSession]]] = None
+    __session_pool: Optional[async_sessionmaker] = None
 
     def __new__(cls):
         """
@@ -62,26 +58,27 @@ class SessionMakerManager:
         """
         The function initializes a session pool for a database connection.
 
-        :param db: The `db` parameter is a string that represents the path to the database file. It is used
+        :param url: The `db` parameter is a string that represents the path to the database file. It is used
         to specify the location of the database that the session pool will connect to
-        :type db: str
         :param echo: The `echo` parameter is a boolean flag that determines whether or not the database
         engine should log all SQL statements that are executed. If `echo` is set to `True`, the engine will
         log all SQL statements to the console. If `echo` is set to `False`, no logging will, defaults to
         False
-        :type echo: bool (optional)
         """
+
         if not self.__session_pool:
             self.__session_pool = await create_session_pool(url=url, echo=echo)
 
-    async def get_pool(self) -> Callable[[], AsyncContextManager[AsyncSession]]:
+    async def get_pool(self, url: str) -> async_sessionmaker:
         """
         The function `get_pool` returns a callable that returns an asynchronous context manager for an async
         session pool.
+        :param url: Database connection string
         :return: The `get_pool` method returns a callable object that takes no arguments and returns an
         asynchronous context manager that yields an `AsyncSession` object.
         """
-        await self.__init_pool()
+
+        await self.__init_pool(url=url)
         return self.__session_pool
 
 

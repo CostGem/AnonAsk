@@ -1,4 +1,3 @@
-# base image with python
 FROM python:3.11.4
 
 ENV IS_DOCKER=true
@@ -15,6 +14,6 @@ COPY poetry.lock pyproject.toml /app/
 RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
 
 RUN poetry
-COY . /app
+COPY . /app
 
 CMD ["python", "/app/src/main.py"]
