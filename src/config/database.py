@@ -47,11 +47,11 @@ DATABASES_DRIVERS = {
 
 
 class DatabaseConfiguration(BaseModel):
-    host: str = getenv("DATABASE_HOST")
-    username: str = getenv("DATABASE_USERNAME")
-    password: str = getenv("DATABASE_PASSWORD")
-    name: str = getenv("DATABASE_NAME")
-    port: int = int(getenv("DATABASE_PORT", 5432))
+    host: str = getenv("POSTGRES_HOST")
+    username: str = getenv("POSTGRES_USER")
+    password: str = getenv("POSTGRES_PASSWORD")
+    name: str = getenv("POSTGRES_DB")
+    port: int = int(getenv("POSTGRES_PORT", 5432))
 
     database: DatabaseType = DatabaseType.POSTGRESQL
     driver: DatabaseDriver = DatabaseDriver.ASYNCPG
@@ -62,10 +62,10 @@ class DatabaseConfiguration(BaseModel):
     def build_connection_url(self) -> str:
         """Returns a database connection string"""
 
-        if self.database not in DATABASES_DRIVERS[self.database]:
+        if self.driver not in DATABASES_DRIVERS[self.database]:
             raise DatabaseDriverError(database=self.database, driver=self.driver)
 
-        return URL.create(
+        a = URL.create(
             drivername=f"{self.database}+{self.driver}",
             username=self.username,
             database=self.name,
@@ -73,3 +73,5 @@ class DatabaseConfiguration(BaseModel):
             port=self.port,
             host=self.host,
         ).render_as_string(hide_password=False)
+        print(a)
+        return a
