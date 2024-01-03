@@ -58,7 +58,7 @@ class BasicCache:
                     "You have set the prefix, that already used in another cache class object"
                 )
             else:
-                BasicCache.__cache_prefix_list.append(cls.__prefix)
+                BasicCache.__cache_prefix_list.append(cls.prefix)
 
     async def __get_redis_key(self) -> Optional[str]:
         """Get a redis key
@@ -92,7 +92,7 @@ class BasicCache:
         :type value: str
         """
         if redis_key := await self.__get_redis_key():
-            if await self.get_from_cache() != value:
+            if await self.get() != value:
                 await self.__redis.set(ex=self.__ttl, name=redis_key, value=value)
         else:
             raise ValueError("Invalid redis_key")
