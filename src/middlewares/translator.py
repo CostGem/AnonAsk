@@ -1,9 +1,9 @@
-from typing import AsyncContextManager, Callable, Dict, Any, Awaitable
+from typing import Callable, Dict, Any, Awaitable
 
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject, User
 
-from src.language.translator import LocalizedTranslator, TranslatorManager
+from translation.translator import LocalizedTranslator, TranslatorManager
 
 
 class TranslatorMiddleware(BaseMiddleware):
@@ -13,14 +13,14 @@ class TranslatorMiddleware(BaseMiddleware):
     """
 
     async def __call__(
-        self,
-        handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
-        event: TelegramObject,
-        data: Dict[str, Any],
+            self,
+            handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
+            event: TelegramObject,
+            data: Dict[str, Any],
     ) -> Any:
         user: User = data["event_from_user"]
 
-        locale = user.language_code
+        locale: str = user.language_code
 
         translator: LocalizedTranslator = TranslatorManager().get_translator(
             locale=locale

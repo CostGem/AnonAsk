@@ -1,6 +1,8 @@
-from aiogram import Router
 from typing import List
-from src.handlers.private import (
+
+from aiogram import Router
+
+from handlers.private import (
     user
 )
 

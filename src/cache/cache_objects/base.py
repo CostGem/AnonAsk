@@ -1,10 +1,11 @@
 from typing import Any, List, Union, Optional
+
 from redis.asyncio.client import Redis
 from termcolor import cprint
 
+from config import CONFIGURATION
 from errors.redis import InvalidRedisKeyError, RedisTTLNotConfiguredError, RedisPrefixNotConfiguredError, \
     RedisPrefixAlreadyUsedError
-from src.config import CONFIGURATION
 
 
 class BasicCache:
@@ -21,10 +22,10 @@ class BasicCache:
     __cache_prefix_list: List[str] = []
 
     def __init__(
-        self,
-        redis: Redis,
-        item_id: Optional[Union[str, int]] = None,
-        ttl: Optional[int] = None,
+            self,
+            redis: Redis,
+            item_id: Optional[Union[str, int]] = None,
+            ttl: Optional[int] = None,
     ) -> None:
         self.__redis = redis
         self.__item_id = item_id

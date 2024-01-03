@@ -1,7 +1,7 @@
 from typing import Dict, List, Tuple
+
 from fluent_compiler.bundle import FluentBundle
 from fluentogram import TranslatorHub, FluentTranslator, TranslatorRunner
-
 
 FLUENT_DICTIONARIES_PATH_DICT = {
     "ru": "src/translation/locales/ru.ftl",

@@ -1,12 +1,10 @@
-from dataclasses import dataclass
 from os import getenv
-from typing import Optional
-from pydantic import BaseModel
 
+from pydantic import BaseModel
 from sqlalchemy import URL
 
-from src.enums.database import DatabaseDriver, DatabaseType
-from src.errors.database import DatabaseDriverError
+from enums.database import DatabaseDriver, DatabaseType
+from errors.database import DatabaseDriverError
 
 DATABASES_DRIVERS = {
     DatabaseType.MARIADB: (

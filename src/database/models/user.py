@@ -9,7 +9,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.database.models.base import BaseModel
+from database.models.base import BaseModel
 
 
 class UsersTable(BaseModel):

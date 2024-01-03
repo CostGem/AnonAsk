@@ -1,6 +1,6 @@
 import logging
-from src.config import CONFIGURATION
 
+from config import CONFIGURATION
 
 if CONFIGURATION.IS_DEVELOPMENT:
     logging.basicConfig(

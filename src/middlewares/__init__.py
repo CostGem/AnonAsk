@@ -1,5 +1,6 @@
 from aiogram import Dispatcher
-from src.middlewares import db, translator
+
+from middlewares import db, translator
 
 
 def register_middlewares(dp: Dispatcher) -> None:

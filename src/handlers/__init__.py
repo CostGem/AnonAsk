@@ -1,7 +1,9 @@
 from typing import List
+
 from aiogram import Router, F
 from aiogram.filters import and_f
-from src.handlers import private
+
+from handlers import private
 
 routers: List[Router] = [private.router]
 router: Router = Router(name="main")
