@@ -1,8 +1,8 @@
 from aiogram import Bot, Dispatcher
 from termcolor import cprint
 
-from middlewares import register_middlewares
-from utils.misc.bot_commands import set_bot_commands
+from src.middlewares import register_middlewares
+from src.utils.misc.bot_commands import set_bot_commands
 
 
 async def on_startup(dispatcher: Dispatcher, bot: Bot) -> None:

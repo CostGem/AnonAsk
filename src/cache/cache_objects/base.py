@@ -3,9 +3,13 @@ from typing import Any, List, Union, Optional
 from redis.asyncio.client import Redis
 from termcolor import cprint
 
-from config import CONFIGURATION
-from errors.redis import InvalidRedisKeyError, RedisTTLNotConfiguredError, RedisPrefixNotConfiguredError, \
+from src.config import CONFIGURATION
+from src.errors.redis import (
+    InvalidRedisKeyError,
+    RedisTTLNotConfiguredError,
+    RedisPrefixNotConfiguredError,
     RedisPrefixAlreadyUsedError
+)
 
 
 class BasicCache:

@@ -2,7 +2,7 @@ from aiogram import Router
 from aiogram.filters import CommandStart
 from aiogram.types import Message
 
-from translation.translator import LocalizedTranslator
+from src.translation.translator import LocalizedTranslator
 
 router: Router = Router(name="main_start")
 

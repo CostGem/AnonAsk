@@ -5,11 +5,11 @@ import uvicorn
 from aiogram.types import WebhookInfo, Update
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from cache.redis import redis_instance
-from config import CONFIGURATION
-from database.engine import session_manager
-from dispatcher_actions import on_shutdown, on_startup
-from loader import bot, dp, webhook_server_app
+from src.cache.redis import redis_instance
+from src.config import CONFIGURATION
+from src.database.engine import session_manager
+from src.dispatcher_actions import on_shutdown, on_startup
+from src.loader import bot, dp, webhook_server_app
 
 
 @webhook_server_app.on_event("startup")

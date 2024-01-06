@@ -1,6 +1,6 @@
 from redis.asyncio.client import Redis
 
-from config import CONFIGURATION
+from src.config import CONFIGURATION
 
 redis_instance: Redis = Redis(
     host=CONFIGURATION.REDIS.host,

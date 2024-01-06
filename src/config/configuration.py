@@ -1,9 +1,9 @@
 from os import getenv
 
-from config.bot import BotConfiguration
-from config.database import DatabaseConfiguration
-from config.logger import LoggerConfiguration
-from config.redis import RedisConfiguration
+from src.config.bot import BotConfiguration
+from src.config.database import DatabaseConfiguration
+from src.config.logger import LoggerConfiguration
+from src.config.redis import RedisConfiguration
 
 
 class Config:

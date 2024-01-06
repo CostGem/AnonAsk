@@ -3,8 +3,8 @@ from os import getenv
 from pydantic import BaseModel
 from sqlalchemy import URL
 
-from enums.database import DatabaseDriver, DatabaseType
-from errors.database import DatabaseDriverError
+from src.enums.database import DatabaseDriver, DatabaseType
+from src.errors.database import DatabaseDriverError
 
 DATABASES_DRIVERS = {
     DatabaseType.MARIADB: (

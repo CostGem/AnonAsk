@@ -5,7 +5,7 @@ from aiogram.types import (
     BotCommand,
     BotCommandScopeDefault,
 )
-from translation.translator import LocalizedTranslator, TranslatorManager
+from src.translation.translator import LocalizedTranslator, TranslatorManager
 
 
 async def set_localized_commands(bot: Bot, translator: LocalizedTranslator) -> None:

@@ -3,7 +3,7 @@ from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from database.models.base import BaseModel
+from src.database.models.base import BaseModel
 
 
 async def create_session_pool(url: str, echo: bool = True) -> async_sessionmaker:

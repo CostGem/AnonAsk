@@ -3,7 +3,7 @@ from typing import Callable, Dict, Any, Awaitable
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject, User
 
-from translation.translator import LocalizedTranslator, TranslatorManager
+from src.translation.translator import LocalizedTranslator, TranslatorManager
 
 
 class TranslatorMiddleware(BaseMiddleware):

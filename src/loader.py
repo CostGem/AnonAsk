@@ -3,10 +3,10 @@ from aiogram import Dispatcher
 from aiogram.fsm.storage.redis import RedisStorage
 from fastapi import FastAPI
 
-from cache.redis import redis_instance
-from config import CONFIGURATION
-from dispatcher_actions import on_shutdown, on_startup
-from handlers import router
+from src.cache.redis import redis_instance
+from src.config import CONFIGURATION
+from src.dispatcher_actions import on_shutdown, on_startup
+from src.handlers import router
 
 
 def get_dispatcher():
