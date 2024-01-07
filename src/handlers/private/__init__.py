@@ -2,7 +2,7 @@ from typing import List
 
 from aiogram import Router
 
-from handlers.private import (
+from src.handlers.private import (
     user
 )
 

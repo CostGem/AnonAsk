@@ -2,7 +2,7 @@ from typing import List
 
 from aiogram import Router
 
-from handlers.private.user import main_start
+from src.handlers.private.user import main_start
 
 routers: List[Router] = [
     main_start.router

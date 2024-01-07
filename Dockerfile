@@ -16,4 +16,4 @@ RUN poetry config virtualenvs.create false && poetry install --no-interaction --
 RUN poetry
 COPY . /app
 
-CMD ["python", "/app/src/main.py"]
+CMD ["python", "-m", "src.main"]
