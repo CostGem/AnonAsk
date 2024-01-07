@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 
 class DatabaseMiddleware(BaseMiddleware):
-    """Database session to handlers"""
+    """Database session to handlers middleware"""
 
     async def __call__(
             self,

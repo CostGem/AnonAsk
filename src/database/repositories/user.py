@@ -1,19 +1,25 @@
-class UserRepository:
-    def __init__(self, session):
-        self.session = session
+"""User repository file."""
+from typing import Optional
 
-    async def get_user(self):
-        return self.session.get("")
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-    @classmethod
-    async def get_user_a(sesssion):
-        return sesssion.get("")
+from src.database.models import UserModel
+from src.database.repositories.abstract import BaseRepository
 
 
+class UserRepository(BaseRepository[UserModel]):
+    """User repository"""
 
-async def main():
-    repo = UserRepository(session=1)
-    await repo.get_user()
+    def __init__(self, session: AsyncSession):
+        """Initialize user repository"""
 
-    await UserRepository.get_user_a(sesssion=1)
+        super().__init__(session=session)
 
+    async def create(self) -> None:
+        await self.session.merge(UserModel())
+
+    async def get(self, user_id: int) -> Optional[UserModel]:
+        return await self.session.scalar(
+            select(UserModel).where(UserModel.user_id == user_id)
+        )

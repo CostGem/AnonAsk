@@ -48,7 +48,7 @@ class TranslatorManager:
         self.t_hub = TranslatorHub(
             locales_map=FLUENT_LOCALES_MAP,
             translators=FLUENT_TRANSLATORS,
-            root_locale="en",
+            root_locale="ru",
         )
         self.__init_translators()
 

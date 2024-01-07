@@ -17,4 +17,5 @@ async def start_command(message: Message, translator: LocalizedTranslator) -> No
     from a user. It contains information such as the message text, sender, chat, and other metadata
     :type message: Message
     """
+
     await message.answer(text=translator.get(key="start_command_message"))

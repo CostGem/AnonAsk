@@ -10,4 +10,6 @@ routers: List[Router] = [
 
 router: Router = Router(name="user")
 
+router.include_routers(*routers)
+
 __all__ = ["router"]

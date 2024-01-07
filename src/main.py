@@ -12,58 +12,58 @@ from src.dispatcher_actions import on_shutdown, on_startup
 from src.loader import bot, dp, webhook_server_app
 
 
-@webhook_server_app.on_event("startup")
-async def startup():
-    """
-    The above function is an event handler that runs when the application starts up and performs various
-    tasks such as deleting any existing webhooks, setting up a new webhook, and initializing session
-    pools.
-    """
-
-    webhook_info: WebhookInfo = await bot.get_webhook_info()
-
-    if webhook_info.url != CONFIGURATION.BOT.webhook_url:
-        await bot.set_webhook(url=CONFIGURATION.BOT.webhook_url)
-    else:
-        await bot.delete_webhook(drop_pending_updates=True)
-        time.sleep(1)
-        await bot.set_webhook(url=CONFIGURATION.BOT.webhook_url)
-
-    await on_startup(bot=bot, dispatcher=dp)
-
-
-@webhook_server_app.post(CONFIGURATION.BOT.webhook_endpoint)
-async def bot_webhook(update: dict):
-    """
-    The above function is a webhook endpoint in a Python application that receives updates and feeds
-    them to a bot for processing.
-
-    :param update: The `update` parameter is a dictionary that contains information about the incoming
-    update from the webhook. It typically includes details such as the message text, sender information,
-    chat ID, etc
-    :type update: dict
-    """
-
-    update: Update = Update.model_validate(update, context={"bot": bot})
-    session_pool: async_sessionmaker = await session_manager.get_pool(
-        url=CONFIGURATION.DATABASE.build_connection_url()
-    )
-
-    await dp.feed_update(
-        bot,
-        update,
-        session_pool=session_pool,
-        redis=redis_instance,
-    )
-
-
-@webhook_server_app.on_event("shutdown")
-async def shutdown():
-    """
-    The function `shutdown` is an event handler that is triggered when the webhook server is shutting
-    down.
-    """
-    await on_shutdown(bot=bot, dispatcher=dp)
+# @webhook_server_app.on_event("startup")
+# async def startup():
+#     """
+#     The above function is an event handler that runs when the application starts up and performs various
+#     tasks such as deleting any existing webhooks, setting up a new webhook, and initializing session
+#     pools.
+#     """
+#
+#     webhook_info: WebhookInfo = await bot.get_webhook_info()
+#
+#     if webhook_info.url != CONFIGURATION.BOT.webhook_url:
+#         await bot.set_webhook(url=CONFIGURATION.BOT.webhook_url)
+#     else:
+#         await bot.delete_webhook(drop_pending_updates=True)
+#         time.sleep(1)
+#         await bot.set_webhook(url=CONFIGURATION.BOT.webhook_url)
+#
+#     await on_startup(bot=bot, dispatcher=dp)
+#
+#
+# @webhook_server_app.post(CONFIGURATION.BOT.webhook_endpoint)
+# async def bot_webhook(update: dict):
+#     """
+#     The above function is a webhook endpoint in a Python application that receives updates and feeds
+#     them to a bot for processing.
+#
+#     :param update: The `update` parameter is a dictionary that contains information about the incoming
+#     update from the webhook. It typically includes details such as the message text, sender information,
+#     chat ID, etc
+#     :type update: dict
+#     """
+#
+#     update: Update = Update.model_validate(update, context={"bot": bot})
+#     session_pool: async_sessionmaker = await session_manager.get_pool(
+#         url=CONFIGURATION.DATABASE.build_connection_url()
+#     )
+#
+#     await dp.feed_update(
+#         bot,
+#         update,
+#         session_pool=session_pool,
+#         redis=redis_instance,
+#     )
+#
+#
+# @webhook_server_app.on_event("shutdown")
+# async def shutdown():
+#     """
+#     The function `shutdown` is an event handler that is triggered when the webhook server is shutting
+#     down.
+#     """
+#     await on_shutdown(bot=bot, dispatcher=dp)
 
 
 def run_webhook() -> None:
@@ -116,3 +116,7 @@ def start_bot() -> None:
             asyncio.run(run_polling())
     except (KeyboardInterrupt, SystemExit, RuntimeError):
         pass
+
+
+if __name__ == "__main__":
+    start_bot()

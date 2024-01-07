@@ -12,7 +12,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from src.database.models.base import BaseModel
 
 
-class UsersTable(BaseModel):
+class UserModel(BaseModel):
     __tablename__ = "users"
 
     user_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
