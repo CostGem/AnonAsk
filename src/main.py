@@ -1,8 +1,7 @@
 import asyncio
-import time
 
 import uvicorn
-from aiogram.types import WebhookInfo, Update
+from aiogram.types import Update
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from src.cache.redis import redis_instance
@@ -35,7 +34,6 @@ async def bot_webhook(update: dict):
         session_pool=session_pool,
         redis=redis_instance,
     )
-
 
 
 def run_webhook() -> None:

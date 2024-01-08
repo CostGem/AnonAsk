@@ -1,9 +1,10 @@
-from contextlib import asynccontextmanager
 import time
+from contextlib import asynccontextmanager
+
 from aiogram import Bot
 from aiogram import Dispatcher
-from aiogram.types import WebhookInfo
 from aiogram.fsm.storage.redis import RedisStorage
+from aiogram.types import WebhookInfo
 from fastapi import FastAPI
 
 from src.cache.redis import redis_instance
@@ -33,6 +34,7 @@ def get_dispatcher():
 
     return dispatcher
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     webhook_info: WebhookInfo = await bot.get_webhook_info()
@@ -46,6 +48,7 @@ async def lifespan(app: FastAPI):
 
     yield
     await on_shutdown(bot=bot, dispatcher=dp)
+
 
 bot: Bot = Bot(
     token=CONFIGURATION.BOT.token,
