@@ -10,7 +10,7 @@ routers: List[Router] = [
     user.router
 ]
 
-router: Router = Router(name="private")
+router: Router = Router(name="Private")
 
 router.include_routers(*routers)
 

@@ -8,7 +8,7 @@ routers: List[Router] = [
     main_start.router
 ]
 
-router: Router = Router(name="user")
+router: Router = Router(name="User")
 
 router.include_routers(*routers)
 
