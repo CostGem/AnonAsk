@@ -10,8 +10,8 @@ from src.translation.translator import LocalizedTranslator
 
 
 async def get_achievements_menu(
-        translator: LocalizedTranslator,
-        achievements: List[AchievementModel]
+        achievements: List[AchievementModel],
+        translator: LocalizedTranslator
 ) -> InlineKeyboardMarkup:
     """
     Return achievements menu
