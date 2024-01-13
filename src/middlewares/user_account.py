@@ -23,3 +23,5 @@ class UserAccountMiddleware(BaseMiddleware):
         user: Optional[UserModel] = await user_repository.get(ident=event.from_user.id)
 
         data["user_data"] = UserData(repository=user_repository, user=user)
+
+        return await handler(event, data)
