@@ -29,9 +29,6 @@ def get_dispatcher():
     dispatcher: Dispatcher = Dispatcher(storage=redis_storage)
     dispatcher.include_router(router)
 
-    dispatcher.startup.register(callback=on_startup)
-    dispatcher.shutdown.register(callback=on_shutdown)
-
     return dispatcher
 
 
