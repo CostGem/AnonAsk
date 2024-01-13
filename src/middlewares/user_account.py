@@ -20,6 +20,6 @@ class UserAccountMiddleware(BaseMiddleware):
     ) -> Any:
         session:  AsyncSession = data["session"]
         user_repository: UserRepository = UserRepository(session=session)
-        user: Optional[UserModel] = await user_repository.get(user_id=event.from_user.id)
+        user: Optional[UserModel] = await user_repository.get(ident=event.from_user.id)
 
         data["user_data"] = UserData(repository=user_repository, user=user)
