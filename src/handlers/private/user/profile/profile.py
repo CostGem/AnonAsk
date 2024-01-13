@@ -12,7 +12,7 @@ router = Router(name="Profile")
 
 @router.message(KeyboardButtonFilter(key="profile_button_text"))
 async def user_profile(message: Message, translator: LocalizedTranslator, user_data: UserData) -> None:
-    profile_menu = await get_profile_menu(translator=translator)
+    profile_menu = await get_profile_menu(user=user_data.user, translator=translator)
     await message.answer(
         text=translator.get(
             key="profile_message",
@@ -31,7 +31,7 @@ async def user_profile(message: Message, translator: LocalizedTranslator, user_d
 
 @router.callback_query(ProfileFactory().filter())
 async def to_user_profile(call: CallbackQuery, translator: LocalizedTranslator, user_data: UserData) -> None:
-    profile_menu = await get_profile_menu(translator=translator)
+    profile_menu = await get_profile_menu(user=user_data.user, translator=translator)
     await call.message.edit_text(
         text=translator.get(
             key="profile_message",

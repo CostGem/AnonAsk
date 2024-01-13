@@ -5,7 +5,7 @@ from typing import Any, Awaitable, Callable
 
 from aiogram import BaseMiddleware
 from aiogram import Dispatcher
-from aiogram.types import TelegramObject, User
+from aiogram.types import TelegramObject, User, CallbackQuery
 from aiolimiter import AsyncLimiter
 from cachetools import TTLCache
 
@@ -50,6 +50,9 @@ class ThrottlingMiddleware(BaseMiddleware):
         if not throttling_data.limiter.has_capacity():
             if not throttling_data.sent_warning:
                 self._cache[event_user.id].sent_warning = True
+
+                if isinstance(event, CallbackQuery):
+                    await event.answer()
 
             return None
 

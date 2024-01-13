@@ -1,9 +1,9 @@
-from typing import Optional
+from typing import Optional, List
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database.models import StatusModel, UserStatusModel
+from src.database.models import StatusModel, UserStatusModel, UserModel
 from src.database.repositories.base import BaseRepository
 
 
@@ -44,6 +44,53 @@ class StatusRepository(BaseRepository[StatusModel]):
                     status_id=2
                 )
             ]
+        )
+
+        await self.session.commit()
+
+    async def get_user_statuses(self, user: UserModel) -> List[StatusModel]:
+        """
+        Return list of user statuses
+
+        :param user: User
+        """
+
+        stmt = (
+            select(StatusModel)
+            .filter(
+                StatusModel.id.in_(
+                    select(
+                        UserStatusModel.status_id
+                    ).filter(
+                        UserStatusModel.user_id == user.id
+                    ).order_by(
+                        UserStatusModel.received_at
+                    )
+                )
+            ).order_by(
+                StatusModel.id
+            )
+        )
+
+        result = await self.session.scalars(stmt)
+        return result.all()
+
+    async def update_user_status(self, user: UserModel, status_id: int) -> None:
+        """
+        Update user status
+
+        :param user: User
+        :param status_id: Status ID
+        """
+
+        await self.session.execute(
+            update(
+                table=UserModel
+            ).where(
+                UserModel.id == user.id
+            ).values(
+                status_id=status_id
+            )
         )
 
         await self.session.commit()

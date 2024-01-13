@@ -358,6 +358,20 @@ files = [
 ]
 
 [[package]]
+name = "emoji"
+version = "2.9.0"
+description = "Emoji for Python"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+files = [
+    {file = "emoji-2.9.0-py2.py3-none-any.whl", hash = "sha256:17b0d53e1d9f787307a4c65aa19badb0a1ffdbc89b3a3cd851fc77821cdaced2"},
+    {file = "emoji-2.9.0.tar.gz", hash = "sha256:5f4a15b7caa9c67fc11be9d90a822e3fa26aeb4e5b7bd2ded754b394d9c47869"},
+]
+
+[package.extras]
+dev = ["coverage", "coveralls", "pytest"]
+
+[[package]]
 name = "fastapi"
 version = "0.108.0"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
@@ -1257,4 +1271,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "44be7526c05830eb1a323bd672e992ac0fe0b3624d94188acad2e118ab678cd2"
+content-hash = "21c070eb2038446ffd4135af93018b09bc6d7c98a279b48c10d32b9a027944b7"

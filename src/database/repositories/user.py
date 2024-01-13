@@ -37,6 +37,8 @@ class UserRepository(BaseRepository[UserModel]):
                         name=name
                     )
                 )
+
+                await self.session.commit()
         else:
             self.session.add(
                 instance=UserModel(
@@ -108,3 +110,23 @@ class UserRepository(BaseRepository[UserModel]):
         )
 
         return users.all()
+
+    async def set_nickname(self, user: UserModel, nickname: str) -> None:
+        """
+        Set nickname to user
+
+        :param user: User
+        :param nickname: Nickname
+        """
+
+        await self.session.execute(
+            update(
+                table=UserModel
+            ).where(
+                UserModel.id == user.id
+            ).values(
+                nickname=nickname
+            )
+        )
+
+        await self.session.commit()

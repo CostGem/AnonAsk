@@ -50,17 +50,7 @@ class LocaleRepository(BaseRepository[LocaleModel]):
         else:
             locale = await self.get_by_code(locale_code=Locale.RU)
 
-            await self.session.execute(
-                update(
-                    table=UserModel
-                ).where(
-                    UserModel.id == user.id
-                ).values(
-                    locale_id=locale.id
-                )
-            )
-
-            await self.session.commit()
+            await self.update_user_locale(user=user, locale_id=locale.id)
 
         return locale
 
@@ -74,3 +64,23 @@ class LocaleRepository(BaseRepository[LocaleModel]):
         )
 
         return locales.all()
+
+    async def update_user_locale(self, user: UserModel, locale_id: int) -> None:
+        """
+        Update user locale
+
+        :param user: User:
+        :param locale_id: Locale ID
+        """
+
+        await self.session.execute(
+            update(
+                table=UserModel
+            ).where(
+                UserModel.id == user.id
+            ).values(
+                locale_id=locale_id
+            )
+        )
+
+        await self.session.commit()
