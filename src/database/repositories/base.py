@@ -2,28 +2,100 @@ import logging
 from typing import Generic, TypeVar, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from models.base import BaseModel
+import abc
+from typing import Generic, TypeVar
+from collections.abc import Sequence
+
+from sqlalchemy import Select, delete, select, update
+from sqlalchemy.ext.asyncio import AsyncSession
 
 AbstractModel = TypeVar("AbstractModel")
 
 
 class BaseRepository(Generic[AbstractModel]):
-    """Repository abstract class"""
+    """Repository abstract class."""
 
-    session: Optional[AsyncSession] = None
+    type_model: type[BaseModel]
+    session: AsyncSession
 
-    def __init__(self, session: AsyncSession):
-        """Initialize abstract repository class
+    def __init__(self, type_model: type[BaseModel], session: AsyncSession):
+        """Initialize abstract repository class.
 
-        :param session: Session in which repository will work
+        :param type_model: Which model will be used for operations
+        :param session: Session in which repository will work.
         """
-
+        self.type_model = type_model
         self.session = session
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def get(self, ident: int | str) -> AbstractModel:
+        """Get an ONE model from the database with PK.
+
+        :param ident: Key which need to find entry in database
+        :return:
+        """
+        return await self.session.get(entity=self.type_model, ident=ident)
+
+    async def get_by_where(self, whereclause) -> AbstractModel | None:
+        """Get an ONE model from the database with whereclause.
+
+
+        :param whereclause: Clause by which entry will be found
+        :return: Model if only one model was found, else None.
+        """
+        statement = select(self.type_model).where(whereclause)
+        return (await self.session.execute(statement)).one_or_none()
+
+    async def get_many(
+        self, whereclause, limit: int = 100, order_by=None
+    ) -> Sequence[BaseModel]:
+        """Get many models from the database with whereclause.
+
+        :param whereclause: Where clause for finding models
+        :param limit: (Optional) Limit count of results
+        :param order_by: (Optional) Order by clause.
+
+        Example:
+        >> Repository.get_many(Model.id == 1, limit=10, order_by=Model.id)
+
+        :return: List of founded models
+        """
+        statement: Select = select(self.type_model).where(whereclause).limit(limit)
+
+        if order_by:
+            statement = statement.order_by(order_by)
+
+        return (await self.session.scalars(statement)).all()
+
+    async def delete(self, whereclause) -> None:
+        """Delete model from the database.
+
+        :param whereclause: (Optional) Which statement
+        :return: Nothing
+        """
+        statement = delete(self.type_model).where(whereclause)
+        await self.session.execute(statement)
+
+    async def update(self, whereclause, **kwargs) -> None:
+        """Delete model from the database.
+
+        :param whereclause: (Optional) Which statement
+        :return: Nothing
+        """
+
         try:
+            await self.session.execute(
+                update(self.type_model).where(whereclause).values(**kwargs)
+            )
             await self.session.flush()
-        except Exception as e:
-            logging.error(msg=f"Error while flushing session: {e}", exc_info=True)
+        except Exception as exc:
             await self.session.rollback()
         else:
             await self.session.commit()
+
+    @abc.abstractmethod
+    async def new(self, *args, **kwargs) -> None:
+        """Add new entry of model to the database.
+
+        :return: Nothing.
+        """
