@@ -2,13 +2,14 @@ from typing import List
 
 from aiogram import Router
 
-from src.handlers.private.user import main_start
+from src.handlers.private.user import commands, profile
 
 routers: List[Router] = [
-    main_start.router
+    commands.router,
+    profile.router
 ]
 
-router: Router = Router(name="user")
+router: Router = Router(name="User")
 
 router.include_routers(*routers)
 

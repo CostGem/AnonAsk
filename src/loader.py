@@ -9,7 +9,7 @@ from fastapi import FastAPI
 
 from src.cache.redis import redis_instance
 from src.config import CONFIGURATION
-from src.dispatcher_actions import on_shutdown, on_startup
+from src.dispatcher_actions import on_shutdown
 from src.handlers import router
 
 
@@ -28,9 +28,6 @@ def get_dispatcher():
 
     dispatcher: Dispatcher = Dispatcher(storage=redis_storage)
     dispatcher.include_router(router)
-
-    dispatcher.startup.register(callback=on_startup)
-    dispatcher.shutdown.register(callback=on_shutdown)
 
     return dispatcher
 

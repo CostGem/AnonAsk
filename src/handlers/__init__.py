@@ -7,7 +7,7 @@ from aiogram.filters import and_f
 from src.handlers import private
 
 routers: List[Router] = [private.router]
-router: Router = Router(name="main")
+router: Router = Router(name="Main")
 
 router.message.filter(
     and_f(

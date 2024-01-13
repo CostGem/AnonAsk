@@ -2,11 +2,11 @@ from datetime import datetime
 
 from sqlalchemy import (
     ForeignKey,
-    DateTime, func
+    DateTime
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.database.models import BaseModel
+from src.database.models.base import BaseModel
 
 
 class UserStatusModel(BaseModel):
@@ -14,4 +14,4 @@ class UserStatusModel(BaseModel):
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     status_id: Mapped[int] = mapped_column(ForeignKey("statuses.id"), nullable=False)
-    received_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now)
+    received_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)

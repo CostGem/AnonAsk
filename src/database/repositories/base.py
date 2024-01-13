@@ -18,12 +18,3 @@ class BaseRepository(Generic[AbstractModel]):
         """
 
         self.session = session
-
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        try:
-            await self.session.flush()
-        except Exception as e:
-            logging.error(msg=f"Error while flushing session: {e}", exc_info=True)
-            await self.session.rollback()
-        else:
-            await self.session.commit()

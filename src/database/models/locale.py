@@ -1,10 +1,7 @@
-from sqlalchemy import (
-    BigInteger,
-    String
-)
+from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.database.models import BaseModel
+from src.database.models.base import BaseModel
 
 
 class LocaleModel(BaseModel):

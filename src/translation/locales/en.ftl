@@ -2,22 +2,23 @@
 
 # Message text
 welcome_message =
-    👋 Welcome to the First School news bot!
+    <b>👋 Welcome to the First School news bot!
     This bot will help you find out all the latest information about upcoming events and innovations, including changes in the schedule. The uniqueness of the bot is that you can anonymously comment on posts in the channel, expressing your opinion in order to provide constructive criticism.
 
-    📝 Before you start using it, you need to register and choose a pseudonym that will be assigned to your account in order to remain incognito.
+    📝 To comment on posts, you must choose a pseudonym that will be assigned to your account in order to remain incognito.
 
     📃 Do not forget to follow the rules that are enshrined in the channel description.
 
-    ✨ Convenient use!
-
-start_message = 👋 Welcome to the First School news bot!
+    ✨ Convenient use!</b>
 
 back_to_main_message = ◀️ Main menu
 
 profile_message =
     📔 <b>ID:</b> { $user_id }
-    📋 <b>Nickname:</b> { $nickname }
+    📋 <b>Nickname:</b> { $have_nickname ->
+        [1] { $nickname }
+        *[0] Not specified
+        }
 
     🌀 <b>Role:</b> { $role_name }
     💠 <b>Status:</b> { $status_emoji }

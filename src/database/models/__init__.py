@@ -1,6 +1,5 @@
 from src.database.models.achievement import AchievementModel
 from src.database.models.achievement_activation_codes import AchievementActivationCodeModel
-from src.database.models.base import BaseModel
 from src.database.models.comments import CommentModel
 from src.database.models.lesson import LessonModel
 from src.database.models.locale import LocaleModel
@@ -17,7 +16,6 @@ from src.database.models.users_achievement_activations import UserAchievementAct
 __all__ = [
     AchievementModel,
     AchievementActivationCodeModel,
-    BaseModel,
     CommentModel,
     LessonModel,
     LocaleModel,

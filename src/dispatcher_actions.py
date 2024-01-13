@@ -2,14 +2,12 @@ from aiogram import Bot, Dispatcher
 from termcolor import cprint
 
 from src.middlewares import register_middlewares
-from src.utils.misc.bot_commands import set_bot_commands
 
 
-async def on_startup(dispatcher: Dispatcher, bot: Bot) -> None:
+async def on_startup(dispatcher: Dispatcher) -> None:
     """Bot startup"""
 
     register_middlewares(dp=dispatcher)
-    await set_bot_commands(bot=bot)
 
     cprint("Bot started", "green")
 

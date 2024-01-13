@@ -3,7 +3,7 @@ from os import getenv
 from pydantic import BaseModel
 from sqlalchemy import URL
 
-from src.enums.database import DatabaseDriver, DatabaseType
+from src.enums import DatabaseDriver, DatabaseType
 from src.errors.database import DatabaseDriverError
 
 DATABASES_DRIVERS = {
@@ -63,7 +63,7 @@ class DatabaseConfiguration(BaseModel):
         if self.driver not in DATABASES_DRIVERS[self.database]:
             raise DatabaseDriverError(database=self.database, driver=self.driver)
 
-        a = URL.create(
+        return URL.create(
             drivername=f"{self.database}+{self.driver}",
             username=self.username,
             database=self.name,
@@ -71,5 +71,3 @@ class DatabaseConfiguration(BaseModel):
             port=self.port,
             host=self.host,
         ).render_as_string(hide_password=False)
-        print(a)
-        return a
