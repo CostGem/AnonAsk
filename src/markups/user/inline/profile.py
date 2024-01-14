@@ -3,7 +3,6 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from src.database.models import UserModel
 from src.factories.achievement import AchievementsFactory
-from src.factories.locale import ChangeLocaleFactory
 from src.factories.nickname import SetNicknameFactory
 from src.factories.profile import ProfileFactory
 from src.factories.status import StatusesFactory
@@ -23,11 +22,6 @@ async def get_profile_menu(user: UserModel, translator: LocalizedTranslator) -> 
     profile_menu.button(
         text=translator.get(key="nickname_button_text", is_changing=bool(user.nickname)),
         callback_data=SetNicknameFactory().pack()
-    )
-
-    profile_menu.button(
-        text=translator.get(key="change_locale_button_text"),
-        callback_data=ChangeLocaleFactory().pack()
     )
 
     profile_menu.button(

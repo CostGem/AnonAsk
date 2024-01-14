@@ -1,6 +1,8 @@
+import datetime
+
 from sqlalchemy import (
     BigInteger,
-    ForeignKey
+    ForeignKey, DateTime
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -13,4 +15,5 @@ class CommentModel(BaseModel):
     post_id: Mapped[int] = mapped_column(ForeignKey("posts.id"), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     parent_comment_id: Mapped[int] = mapped_column(ForeignKey("comments.id"), nullable=True)
-    message_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    message_id: Mapped[int] = mapped_column(BigInteger, nullable=True)
+    commented_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow, nullable=False)

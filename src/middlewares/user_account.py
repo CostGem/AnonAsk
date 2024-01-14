@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.classes.user.user_data import UserData
 from src.database.models import UserModel, RoleModel, StatusModel, LocaleModel
-from src.database.repositories import UserRepository, RoleRepository, StatusRepository, LocaleRepository
+from src.database.repositories import UserRepository, RoleRepository, StatusRepository
 
 
 class UserAccountMiddleware(BaseMiddleware):
@@ -22,19 +22,16 @@ class UserAccountMiddleware(BaseMiddleware):
         user_repository: UserRepository = UserRepository(session=session)
         role_repository: RoleRepository = RoleRepository(session=session)
         status_repository: StatusRepository = StatusRepository(session=session)
-        locale_repository: LocaleRepository = LocaleRepository(session=session)
 
-        user: Optional[UserModel] = await user_repository.get(user_id=event.from_user.id)
+        user: Optional[UserModel] = await user_repository.get_by_id(user_id=event.from_user.id)
         role: Optional[RoleModel] = await role_repository.get(role_id=user.role_id) if user else None
         status: Optional[StatusModel] = await status_repository.get(status_id=user.status_id) if user else None
-        locale: Optional[LocaleModel] = await locale_repository.get_user_locale(user=user) if user else None
 
         data["user_data"] = UserData(
             repository=user_repository,
             user=user,
             role=role,
-            status=status,
-            locale=locale
+            status=status
         )
 
         return await handler(event, data)

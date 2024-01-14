@@ -13,6 +13,8 @@ welcome_message =
 
 back_to_main_message = ◀️ Главное меню
 
+nickname_not_set_message = ‼️Чтобы комментировать записи, необходимо выбрать никнейм
+
 profile_message =
     📔 <b>ID:</b> { $user_id }
     📋 <b>Никнейм:</b> { $have_nickname ->
@@ -22,8 +24,6 @@ profile_message =
 
     🌀 <b>Роль:</b> { $role_name }
     💠 <b>Статус:</b> { $status_emoji }
-
-    { $locale_emoji } <b>Язык:</b> { $locale_name }
 
     📆 <b>Дата регистрации:</b> { $register_date }
 
@@ -151,7 +151,7 @@ confirm_timetable_add_message =
     }</b>
 
 cancel_timetable_add_message =
-    ‼️ <b>{ $is_changing_timetable ->
+    ‼️ <b>{ $timetable_exists ->
     [1] Изменение
     *[0] Добавление
     } расписания отменено</b>
@@ -222,7 +222,10 @@ you_blocked =
 comment_user_info_message =
     💭 <b>Комментарий от «{ $nickname }»</b>
     📖 <b>Имя:</b> { $name }
-    📋 <b>Тег:</b> { $username }
+    📋 <b>Тег:</b> { $have_username ->
+        [1] @{ $nickname }
+        *[0] Не указан
+    }
     🌀 <b>Роль:</b> { $role_name }
     💠 <b>Статус:</b> { $status_emoji }
 

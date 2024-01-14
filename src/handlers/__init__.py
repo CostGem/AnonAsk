@@ -4,9 +4,13 @@ from aiogram import Router, F
 from aiogram.enums import ChatType
 from aiogram.filters import and_f
 
-from src.handlers import private
+from src.handlers import private, channel
 
-routers: List[Router] = [private.router]
+routers: List[Router] = [
+    private.router,
+    channel.router
+]
+
 router: Router = Router(name="Main")
 
 router.message.filter(

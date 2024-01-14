@@ -21,8 +21,6 @@ async def user_profile(message: Message, translator: LocalizedTranslator, user_d
             nickname=user_data.user.nickname,
             status_emoji=user_data.status.emoji,
             role_name=user_data.role.name,
-            locale_emoji=user_data.locale.emoji,
-            locale_name=user_data.locale.name,
             register_date=user_data.user.register_date.strftime("%d.%m.%Y")
         ),
         reply_markup=profile_menu
@@ -40,8 +38,6 @@ async def to_user_profile(call: CallbackQuery, translator: LocalizedTranslator, 
             nickname=user_data.user.nickname,
             status_emoji=user_data.status.emoji,
             role_name=user_data.role.name,
-            locale_emoji=user_data.locale.emoji,
-            locale_name=user_data.locale.name,
             register_date=user_data.user.register_date.strftime("%d.%m.%Y")
         ),
         reply_markup=profile_menu

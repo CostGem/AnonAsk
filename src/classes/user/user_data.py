@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from src.database.models import UserModel, RoleModel, StatusModel, LocaleModel
+from src.database.models import UserModel, RoleModel, StatusModel
 from src.database.repositories import UserRepository
 
 
@@ -11,4 +11,3 @@ class UserData:
     user: Optional[UserModel]
     role: Optional[RoleModel]
     status: Optional[StatusModel]
-    locale: Optional[LocaleModel]

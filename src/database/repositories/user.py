@@ -25,7 +25,7 @@ class UserRepository(BaseRepository[UserModel]):
         :param username: Username of the user
         """
 
-        if user := await self.get(user_id=user_id):
+        if user := await self.get_by_id(user_id=user_id):
             if user.username != username or user.name != name:
                 await self.session.execute(
                     update(
@@ -50,21 +50,32 @@ class UserRepository(BaseRepository[UserModel]):
                 )
             )
 
-            user = await self.get(user_id=user_id)
+            user = await self.get_by_id(user_id=user_id)
 
             await StatusRepository(session=self.session).give_default_statuses_to_user(user_id=user.id)
 
             return user
 
-    async def get(self, user_id: int) -> Optional[UserModel]:
+    async def get_by_id(self, user_id: int) -> Optional[UserModel]:
         """
-        Return user by ID
+        Return user by telegram user ID
 
         :param user_id: User ID
         """
 
         return await self.session.scalar(
             select(UserModel).where(UserModel.user_id == user_id)
+        )
+
+    async def get_by_pk(self, user_id: int) -> Optional[UserModel]:
+        """
+        Return user by pk
+
+        :param user_id: User pk
+        """
+
+        return await self.session.scalar(
+            select(UserModel).where(UserModel.id == user_id)
         )
 
     async def get_status(self, user: UserModel) -> StatusModel:
@@ -102,8 +113,13 @@ class UserRepository(BaseRepository[UserModel]):
             select(func.count(UserModel.user_id)).where(UserModel.is_chat_blocked == False)
         )
 
-    async def get_not_bot_blocked_users(self) -> List[UserModel]:
-        """Returns all users who have not blocked the bot"""
+    async def get_not_bot_blocked_users(self, offset: int, limit: int) -> List[UserModel]:
+        """
+        Returns all users who have not blocked the bot
+
+        :param offset: Offset
+        :param limit: Limit
+        """
 
         users = await self.session.scalars(
             select(UserModel.user_id).where(UserModel.is_chat_blocked == False)
@@ -126,6 +142,45 @@ class UserRepository(BaseRepository[UserModel]):
                 UserModel.id == user.id
             ).values(
                 nickname=nickname
+            )
+        )
+
+        await self.session.commit()
+
+    async def ban(self, user: UserModel) -> None:
+        """
+        Ban user
+
+        :param user: User
+        """
+
+        await self.session.execute(
+            update(
+                table=UserModel
+            ).where(
+                UserModel.id == user.id
+            ).values(
+                is_banned=True
+            )
+        )
+
+        await self.session.commit()
+
+    async def update_is_chat_blocked(self, user: UserModel, chat_blocked: bool) -> None:
+        """
+        Update is_chat_blocked status for user
+
+        :param user: User
+        :param chat_blocked: Chat blocked status
+        """
+
+        await self.session.execute(
+            update(
+                table=UserModel
+            ).where(
+                UserModel.id == user.id
+            ).values(
+                is_chat_blocked=chat_blocked
             )
         )
 

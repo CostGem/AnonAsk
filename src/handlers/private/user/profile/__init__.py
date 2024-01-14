@@ -2,11 +2,10 @@ from typing import List
 
 from aiogram import Router
 
-from src.handlers.private.user.profile import profile, locale, status, nickname, achievement
+from src.handlers.private.user.profile import profile, status, nickname, achievement
 
 routers: List[Router] = [
     profile.router,
-    locale.router,
     status.router,
     nickname.router,
     achievement.router

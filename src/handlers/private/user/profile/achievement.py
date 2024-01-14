@@ -2,6 +2,7 @@ from aiogram import Router
 from aiogram.filters import StateFilter
 from aiogram.types import CallbackQuery
 from sqlalchemy.ext.asyncio import AsyncSession
+from src.utils.user.achievement import get_achievements_text
 
 from src.classes.user.user_data import UserData
 from src.database.repositories import AchievementRepository, StatusRepository
@@ -9,7 +10,6 @@ from src.factories.achievement import AchievementsFactory, AchievementDetailsFac
 from src.markups.user.inline.achievement import get_to_achievements_menu, get_achievements_menu
 from src.markups.user.inline.profile import get_to_profile_menu
 from src.translation.translator import LocalizedTranslator
-from src.utils.achievement import get_achievements_text
 
 router = Router(name="Achievements")
 

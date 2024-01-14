@@ -1,6 +1,6 @@
 from aiogram import Dispatcher
 
-from src.middlewares import db, translator, user_account, throttling
+from src.middlewares import db, translator, user_account, throttling, album
 
 
 def register_middlewares(dp: Dispatcher) -> None:
@@ -34,6 +34,9 @@ def register_middlewares(dp: Dispatcher) -> None:
     # Translator
     dp.message.outer_middleware(translator.TranslatorMiddleware())
     dp.callback_query.outer_middleware(translator.TranslatorMiddleware())
+
+    # Album
+    dp.message.outer_middleware(album.AlbumMiddleware())
 
 
 __all__ = "register_middlewares"

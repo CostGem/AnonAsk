@@ -1,7 +1,4 @@
-from contextlib import suppress
-
 from aiogram import Router
-from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import StateFilter
 from aiogram.types import CallbackQuery
 from sqlalchemy.ext.asyncio import AsyncSession

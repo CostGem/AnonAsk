@@ -23,7 +23,6 @@ class UserModel(BaseModel):
 
     role_id: Mapped[int] = mapped_column(ForeignKey("roles.id"), nullable=False)
     status_id: Mapped[int] = mapped_column(ForeignKey("statuses.id"), nullable=False)
-    locale_id: Mapped[int] = mapped_column(ForeignKey("locales.id"), nullable=True)
 
     is_chat_blocked: Mapped[bool] = mapped_column(
         Boolean, default=False, nullable=False

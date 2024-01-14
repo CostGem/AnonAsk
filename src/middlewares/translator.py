@@ -20,9 +20,7 @@ class TranslatorMiddleware(BaseMiddleware):
             event: TelegramObject,
             data: Dict[str, Any],
     ) -> Any:
-        user_data: UserData = data["user_data"]
-
-        locale: str = user_data.locale.code if user_data.locale else Locale.RU
+        locale: str = Locale.RU
 
         translator: LocalizedTranslator = TranslatorManager().get_translator(
             locale=locale

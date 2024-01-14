@@ -19,12 +19,31 @@ class StatusRepository(BaseRepository[StatusModel]):
         """
         Return status by ID
 
-        :param status_id: Role ID
+        :param status_id: Status ID
         """
 
         return await self.session.scalar(
             select(StatusModel).where(StatusModel.id == status_id)
         )
+
+    async def user_has_status(self, user_id: int, status_id: int) -> bool:
+        """
+        Return True if user has status, else False
+
+        :param user_id: User ID
+        :param status_id: Status ID
+        """
+
+        query = select(
+            select(
+                UserStatusModel
+            ).where(
+                UserStatusModel.user_id == user_id,
+                UserStatusModel.status_id == status_id
+            ).exists()
+        )
+
+        return await self.session.scalar(query)
 
     async def give_default_statuses_to_user(self, user_id: int) -> None:
         """

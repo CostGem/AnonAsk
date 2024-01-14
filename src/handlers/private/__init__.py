@@ -3,11 +3,13 @@ from typing import List
 from aiogram import Router
 
 from src.handlers.private import (
-    user
+    user,
+    admin
 )
 
 routers: List[Router] = [
-    user.router
+    user.router,
+    admin.router
 ]
 
 router: Router = Router(name="Private")

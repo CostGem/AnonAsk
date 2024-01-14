@@ -3,6 +3,7 @@ from os import getenv
 from src.config.bot import BotConfiguration
 from src.config.database import DatabaseConfiguration
 from src.config.logger import LoggerConfiguration
+from src.config.other import DataConfiguration
 from src.config.redis import RedisConfiguration
 
 
@@ -13,3 +14,4 @@ class Config:
     DATABASE: DatabaseConfiguration = DatabaseConfiguration()
     REDIS: RedisConfiguration = RedisConfiguration()
     LOGGER: LoggerConfiguration = LoggerConfiguration(is_dev=IS_DEVELOPMENT)
+    DATA: DataConfiguration = DataConfiguration()
