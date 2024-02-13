@@ -5,7 +5,7 @@ from fluentogram import TranslatorHub, FluentTranslator, TranslatorRunner
 
 TranslatorGeneric = TypeVar("TranslatorGeneric", bound="TranslatorManager")
 
-FLUENT_DICTIONARIES_PATH_DICT = {
+FLUENT_DICTIONARIES_PATH_DICT: Dict[str, str] = {
     "ru": "src/translation/locales/ru.ftl",
 }
 
