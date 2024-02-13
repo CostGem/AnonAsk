@@ -3,10 +3,8 @@ from typing import Dict, List, Tuple
 from fluent_compiler.bundle import FluentBundle
 from fluentogram import TranslatorHub, FluentTranslator, TranslatorRunner
 
-from src.enums import Locale
-
 FLUENT_DICTIONARIES_PATH_DICT = {
-    Locale.RU: "src/translation/locales/ru.ftl",
+    "ru": "src/translation/locales/ru.ftl",
 }
 
 FLUENT_TRANSLATORS: List[FluentTranslator] = [
@@ -20,7 +18,7 @@ FLUENT_TRANSLATORS: List[FluentTranslator] = [
 ]
 
 FLUENT_LOCALES_MAP: Dict[str, Tuple[str]] = {
-    Locale.RU: (Locale.RU,),
+    "ru": ("ru",),
 }
 
 
