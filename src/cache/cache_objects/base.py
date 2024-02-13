@@ -1,9 +1,8 @@
+import logging
 from typing import Any, List, Union, Optional
 
 from redis.asyncio.client import Redis
-from termcolor import cprint
 
-from src.config import CONFIGURATION
 from src.errors.redis import (
     InvalidRedisKeyError,
     RedisTTLNotConfiguredError,
@@ -59,11 +58,7 @@ class BaseCache:
 
         if key := await self.__get_redis_key():
             if redis_value := await self.__redis.get(name=key):
-                if CONFIGURATION.IS_DEVELOPMENT:
-                    cprint(
-                        f"{self.prefix}:{self.__item_id} received from the cache",
-                        "green",
-                    )
+                logging.debug(f"{self.prefix}:{self.__item_id} received from the cache")
                 return redis_value
 
     async def set(self, value: Any) -> None:
