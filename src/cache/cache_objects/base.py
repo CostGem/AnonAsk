@@ -12,22 +12,18 @@ from src.errors.redis import (
 )
 
 
-class BasicCache:
+class BaseCache:
     """Base class for cache"""
 
     ttl: int = 60
     prefix: str
+    separator: str = ":"
 
     __redis: Redis
     __item_id: Optional[Union[str, int]]
-    __cache_prefix_list: List[str] = []
+    __cache_prefixes_list: List[str] = []
 
-    def __init__(
-            self,
-            redis: Redis,
-            item_id: Optional[Union[str, int]] = None,
-            ttl: Optional[int] = None,
-    ) -> None:
+    def __init__(self, redis: Redis, item_id: Optional[Union[str, int]] = None, ttl: Optional[int] = None) -> None:
         self.__redis = redis
         self.__item_id = item_id
         self.__ttl = ttl if ttl else self.__ttl
@@ -46,17 +42,17 @@ class BasicCache:
             if not hasattr(cls, "prefix"):
                 raise RedisPrefixNotConfiguredError()
             else:
-                cls.__prefix = cls.prefix
+                cls.prefix = cls.prefix
 
-            if cls.prefix in BasicCache.__cache_prefix_list:
+            if cls.prefix in BaseCache.__cache_prefixes_list:
                 raise RedisPrefixAlreadyUsedError(prefix=cls.prefix)
             else:
-                BasicCache.__cache_prefix_list.append(cls.prefix)
+                BaseCache.__cache_prefixes_list.append(cls.prefix)
 
     async def __get_redis_key(self) -> Optional[str]:
         """Redis key builder"""
 
-        return f"{self.__prefix}:{self.__item_id}"
+        return f"{self.prefix}{self.separator}{self.__item_id}" if self.__item_id else self.prefix
 
     async def get(self) -> Optional[Any]:
         """Get a cached value from redis"""
@@ -70,7 +66,7 @@ class BasicCache:
                     )
                 return redis_value
 
-    async def set(self, value: Union[bytes, memoryview, str, int, float]) -> None:
+    async def set(self, value: Any) -> None:
         """Set cache value"""
 
         if redis_key := await self.__get_redis_key():
