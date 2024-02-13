@@ -1,7 +1,9 @@
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, TypeVar
 
 from fluent_compiler.bundle import FluentBundle
 from fluentogram import TranslatorHub, FluentTranslator, TranslatorRunner
+
+TranslatorGeneric = TypeVar("TranslatorGeneric", bound="TranslatorManager")
 
 FLUENT_DICTIONARIES_PATH_DICT = {
     "ru": "src/translation/locales/ru.ftl",
@@ -38,7 +40,7 @@ class TranslatorManager:
     t_hub: TranslatorHub
     translators: Dict[str, LocalizedTranslator] = {}
 
-    def __new__(cls) -> "TranslatorManager":
+    def __new__(cls) -> TranslatorGeneric:
         if not hasattr(cls, "instance"):
             cls.instance = super(TranslatorManager, cls).__new__(cls)
 
@@ -54,12 +56,15 @@ class TranslatorManager:
 
     def __init_translators(self) -> None:
         """The function initializes translators for each locale using the t_hub object"""
+
         for locale in self.t_hub.locales_map:
             self.translators[locale] = LocalizedTranslator(
                 translator=self.t_hub.get_translator_by_locale(locale), locale=locale
             )
 
     def get_translator(self, locale: str) -> LocalizedTranslator:
+        """Returns a translator from translators list"""
+
         if locale not in self.translators:
             locale = self.t_hub.root_locale
 
