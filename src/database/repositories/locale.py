@@ -17,7 +17,7 @@ class LocaleRepository(BaseRepository[LocaleModel]):
 
     async def get_by_pk(self, locale_id: int) -> Optional[LocaleModel]:
         """
-        Return locale by pk
+        Returns a locale by pk
 
         :param locale_id: Locale pk
         """
@@ -28,7 +28,7 @@ class LocaleRepository(BaseRepository[LocaleModel]):
 
     async def get_by_code(self, locale_code: str) -> Optional[LocaleModel]:
         """
-        Return locale by locale code
+        Returns a locale by locale code
 
         :param locale_code: Locale code
         """
@@ -38,7 +38,7 @@ class LocaleRepository(BaseRepository[LocaleModel]):
         )
 
     async def get_all(self, user: UserModel) -> Sequence[LocaleModel]:
-        """Return all locales"""
+        """Returns all locales"""
 
         if user.locale_id:
             locales = await self.session.scalars(

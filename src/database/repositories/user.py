@@ -22,7 +22,7 @@ class UserRepository(BaseRepository[UserModel]):
 
     async def get_by_id(self, user_id: int) -> Optional[UserModel]:
         """
-        Return user by user ID
+        Returns a user by user ID
 
         :param user_id: User ID
         """
@@ -33,7 +33,7 @@ class UserRepository(BaseRepository[UserModel]):
 
     async def get_by_pk(self, user_id: int) -> Optional[UserModel]:
         """
-        Return user by pk
+        Returns a user by pk
 
         :param user_id: User pk
         """
