@@ -2,13 +2,11 @@ from typing import List
 
 from aiogram import Router
 
-from src.handlers.channel.service import post
-
 routers: List[Router] = [
-    post.router
+    ...
 ]
 
-router: Router = Router(name="Service")
+router: Router = Router(name="Service routers")
 
 router.include_routers(*routers)
 

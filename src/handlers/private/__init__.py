@@ -1,18 +1,17 @@
 from typing import List
 
-from aiogram import Router
+from aiogram import Router, F
+from aiogram.enums import ChatType
 
-from src.handlers.private import (
-    user,
-    admin
-)
+from src.handlers.private import user
 
 routers: List[Router] = [
-    user.router,
-    admin.router
+    user.router
 ]
 
-router: Router = Router(name="Private")
+router: Router = Router(name="Private routers")
+
+router.message.filter()
 
 router.include_routers(*routers)
 

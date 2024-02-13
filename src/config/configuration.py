@@ -1,17 +1,28 @@
 from os import getenv
+from typing import Self
+
+from pydantic import BaseModel
 
 from src.config.bot import BotConfiguration
 from src.config.database import DatabaseConfiguration
 from src.config.logger import LoggerConfiguration
-from src.config.other import DataConfiguration
 from src.config.redis import RedisConfiguration
 
 
-class Config:
-    USE_WEBHOOK: bool = getenv("USE_WEBHOOK") == "true"
-    IS_DEVELOPMENT: bool = True
-    BOT: BotConfiguration = BotConfiguration()
-    DATABASE: DatabaseConfiguration = DatabaseConfiguration()
-    REDIS: RedisConfiguration = RedisConfiguration()
-    LOGGER: LoggerConfiguration = LoggerConfiguration(is_dev=IS_DEVELOPMENT)
-    DATA: DataConfiguration = DataConfiguration()
+class Config(BaseModel):
+    USE_WEBHOOK: bool
+    IS_DEVELOPMENT: bool
+    BOT: BotConfiguration
+    DATABASE: DatabaseConfiguration
+    REDIS: RedisConfiguration
+    LOGGER: LoggerConfiguration
+
+    def load(self) -> Self:
+        self.USE_WEBHOOK = getenv("USE_WEBHOOK") == "true"
+        self.IS_DEVELOPMENT = True
+        self.BOT = BotConfiguration()
+        self.DATABASE = DatabaseConfiguration()
+        self.REDIS = RedisConfiguration()
+        self.LOGGER = LoggerConfiguration(is_dev=self.IS_DEVELOPMENT)
+
+        return self

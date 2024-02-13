@@ -1,10 +1,9 @@
-from typing import Optional, List
+from typing import Optional
 
-from sqlalchemy import select, update, func
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database.models import UserModel, StatusModel, UserStatusModel
-from src.database.repositories import StatusRepository
+from src.database.models import UserModel
 from src.database.repositories.base import BaseRepository
 
 
@@ -17,48 +16,13 @@ class UserRepository(BaseRepository[UserModel]):
         super().__init__(session=session)
 
     async def register(self, user_id: int, name: str, username: Optional[str] = None) -> UserModel:
-        """
-        Register new user if not exists
+        """Register new user if not exists"""
 
-        :param user_id: User ID
-        :param name: Name of the user
-        :param username: Username of the user
-        """
-
-        if user := await self.get_by_id(user_id=user_id):
-            if user.username != username or user.name != name:
-                await self.session.execute(
-                    update(
-                        table=UserModel
-                    ).where(
-                        UserModel.id == user.id
-                    ).values(
-                        username=username,
-                        name=name
-                    )
-                )
-
-                await self.session.commit()
-        else:
-            self.session.add(
-                instance=UserModel(
-                    user_id=user_id,
-                    name=name,
-                    username=username,
-                    role_id=1,
-                    status_id=1
-                )
-            )
-
-            user = await self.get_by_id(user_id=user_id)
-
-            await StatusRepository(session=self.session).give_default_statuses_to_user(user_id=user.id)
-
-            return user
+        pass
 
     async def get_by_id(self, user_id: int) -> Optional[UserModel]:
         """
-        Return user by telegram user ID
+        Return user by user ID
 
         :param user_id: User ID
         """
@@ -78,95 +42,7 @@ class UserRepository(BaseRepository[UserModel]):
             select(UserModel).where(UserModel.id == user_id)
         )
 
-    async def get_status(self, user: UserModel) -> StatusModel:
-        """
-        Return user status
-
-        :param user: User object
-        """
-
-        user_status = await self.session.scalar(
-            select(UserStatusModel.status_id).where(UserModel.user_id == user.id)
-        )
-
-        return await self.session.scalar(
-            select(StatusModel).where(StatusModel.id == user_status)
-        )
-
-    async def nickname_is_taken(self, nickname: str) -> bool:
-        """
-        Return True if nickname is taken, else False
-
-        :param nickname: Nickname
-        """
-
-        exist_user = await self.session.scalar(
-            select(UserModel.nickname).where(UserModel.nickname.ilike(f"%{nickname}%"))
-        )
-
-        return exist_user is not None
-
-    async def get_not_bot_blocked_users_count(self) -> int:
-        """Returns the number of users who have not blocked the bot"""
-
-        return await self.session.scalar(
-            select(func.count(UserModel.user_id)).where(UserModel.is_chat_blocked == False)
-        )
-
-    async def get_not_bot_blocked_users(self, offset: int, limit: int) -> List[UserModel]:
-        """
-        Returns all users who have not blocked the bot
-
-        :param offset: Offset
-        :param limit: Limit
-        """
-
-        users = await self.session.scalars(
-            select(UserModel.user_id).where(UserModel.is_chat_blocked == False)
-        )
-
-        return users.all()
-
-    async def set_nickname(self, user: UserModel, nickname: str) -> None:
-        """
-        Set nickname to user
-
-        :param user: User
-        :param nickname: Nickname
-        """
-
-        await self.session.execute(
-            update(
-                table=UserModel
-            ).where(
-                UserModel.id == user.id
-            ).values(
-                nickname=nickname
-            )
-        )
-
-        await self.session.commit()
-
-    async def ban(self, user: UserModel) -> None:
-        """
-        Ban user
-
-        :param user: User
-        """
-
-        await self.session.execute(
-            update(
-                table=UserModel
-            ).where(
-                UserModel.id == user.id
-            ).values(
-                is_banned=True
-            )
-        )
-
-        await self.session.commit()
-
-    async def update_is_chat_blocked(self, user: UserModel, chat_blocked: bool) -> None:
+    async def update_chat_blocked(self, user: UserModel, chat_blocked: bool) -> None:
         """
         Update is_chat_blocked status for user
 

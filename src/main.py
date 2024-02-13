@@ -13,15 +13,7 @@ from src.loader import bot, dp, webhook_server_app
 
 @webhook_server_app.post(CONFIGURATION.BOT.webhook_endpoint)
 async def bot_webhook(update: dict):
-    """
-    The above function is a webhook endpoint in a Python application that receives updates and feeds
-    them to a bot for processing.
-
-    :param update: The `update` parameter is a dictionary that contains information about the incoming
-    update from the webhook. It typically includes details such as the message text, sender information,
-    chat ID, etc
-    :type update: dict
-    """
+    """Bot webhook endpoint"""
 
     update: Update = Update.model_validate(update, context={"bot": bot})
     session_pool: async_sessionmaker = await session_manager.get_pool(
@@ -37,10 +29,7 @@ async def bot_webhook(update: dict):
 
 
 def run_webhook() -> None:
-    """
-    The function `run_webhook` runs a webhook server with specified configurations and registers webhook
-    endpoints if wallet webhook is enabled.
-    """
+    """Run webhook server"""
 
     uvicorn.run(
         webhook_server_app,
@@ -52,10 +41,7 @@ def run_webhook() -> None:
 
 
 async def run_polling() -> None:
-    """
-    The function `run_polling` starts a polling process for a bot using the `dp` object and various
-    dependencies.
-    """
+    """Start bot polling"""
 
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
@@ -74,10 +60,7 @@ async def run_polling() -> None:
 
 
 def start_bot() -> None:
-    """
-    The function `start_bot` runs either a webhook or polling based on the value of the `USE_WEBHOOK`
-    variable.
-    """
+    """Start the bot with polling or webhook"""
 
     try:
         if CONFIGURATION.USE_WEBHOOK:

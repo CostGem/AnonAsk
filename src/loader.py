@@ -16,8 +16,7 @@ from src.handlers import router
 def get_dispatcher():
     """
     The function `get_dispatcher` creates and configures a `Dispatcher` object for handling requests,
-    using a Redis storage backend.
-    :return: an instance of the `Dispatcher` class.
+    using a Redis storage backend
     """
 
     redis_storage = RedisStorage(
@@ -40,7 +39,7 @@ async def lifespan(app: FastAPI):
         await bot.set_webhook(url=CONFIGURATION.BOT.webhook_url)
     else:
         await bot.delete_webhook(drop_pending_updates=True)
-        time.sleep(1)
+        # time.sleep(1)
         await bot.set_webhook(url=CONFIGURATION.BOT.webhook_url)
 
     yield

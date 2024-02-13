@@ -4,21 +4,13 @@ from src.middlewares import db, translator, user_account, throttling, album
 
 
 def register_middlewares(dp: Dispatcher) -> None:
-    """
-    The function `register_middlewares` adds a database middleware to various types of messages and
-    queries in a Telegram bot.
-
-    :param dp: The `dp` parameter is an instance of the `Dispatcher` class. The `Dispatcher` class is
-    responsible for handling incoming updates and routing them to the appropriate handlers
-    :type dp: Dispatcher
-    """
+    """Register middlewares"""
 
     # Throttling
     dp.message.outer_middleware(throttling.ThrottlingMiddleware())
     dp.callback_query.outer_middleware(throttling.ThrottlingMiddleware())
     dp.my_chat_member.outer_middleware(throttling.ThrottlingMiddleware())
     dp.pre_checkout_query.outer_middleware(throttling.ThrottlingMiddleware())
-    dp.poll_answer.outer_middleware(throttling.ThrottlingMiddleware())
 
     # Database
     dp.message.outer_middleware(db.DatabaseMiddleware())

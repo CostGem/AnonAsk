@@ -8,7 +8,7 @@ routers: List[Router] = [
     service.router
 ]
 
-router: Router = Router(name="Channel")
+router: Router = Router(name="Channel routers")
 
 router.include_routers(*routers)
 

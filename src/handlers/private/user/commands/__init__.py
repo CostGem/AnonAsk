@@ -8,7 +8,7 @@ routers: List[Router] = [
     start.router
 ]
 
-router: Router = Router(name="User commands")
+router: Router = Router(name="User private commands")
 
 router.include_routers(*routers)
 
