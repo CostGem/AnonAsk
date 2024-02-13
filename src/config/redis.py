@@ -1,9 +1,9 @@
+from dataclasses import dataclass
 from os import getenv
 
-from pydantic import BaseModel
 
-
-class RedisConfiguration(BaseModel):
+@dataclass
+class RedisConfiguration:
     host: str = getenv("REDIS_HOST")
     username: str = getenv("REDIS_USERNAME")
     password: str = getenv("REDIS_PASSWORD")

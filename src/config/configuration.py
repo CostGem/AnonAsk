@@ -1,7 +1,6 @@
+from dataclasses import dataclass
 from os import getenv
 from typing import Self
-
-from pydantic import BaseModel
 
 from src.config.bot import BotConfiguration
 from src.config.database import DatabaseConfiguration
@@ -9,7 +8,8 @@ from src.config.logger import LoggerConfiguration
 from src.config.redis import RedisConfiguration
 
 
-class Config(BaseModel):
+@dataclass
+class Config:
     USE_WEBHOOK: bool
     IS_DEVELOPMENT: bool
     BOT: BotConfiguration

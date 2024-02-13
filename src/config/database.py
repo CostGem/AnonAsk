@@ -1,6 +1,6 @@
+from dataclasses import dataclass
 from os import getenv
 
-from pydantic import BaseModel
 from sqlalchemy import URL
 
 from src.enums import DatabaseDriver, DatabaseType
@@ -44,7 +44,8 @@ DATABASES_DRIVERS = {
 }
 
 
-class DatabaseConfiguration(BaseModel):
+@dataclass
+class DatabaseConfiguration:
     host: str = getenv("POSTGRES_HOST")
     username: str = getenv("POSTGRES_USER")
     password: str = getenv("POSTGRES_PASSWORD")

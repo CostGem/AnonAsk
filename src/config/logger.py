@@ -1,10 +1,10 @@
 import logging
+from dataclasses import dataclass
 from typing import Union
 
-from pydantic import BaseModel
 
-
-class LoggerConfiguration(BaseModel):
+@dataclass
+class LoggerConfiguration:
     log_path: str = "logs/logs.log"
     level: Union[str, int] = logging.ERROR
 

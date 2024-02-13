@@ -1,12 +1,13 @@
+from dataclasses import dataclass
 from os import getenv
 from typing import Optional
 
 from aiogram.client.session.base import BaseSession
 from aiogram.enums import ParseMode
-from pydantic import BaseModel
 
 
-class BotConfiguration(BaseModel):
+@dataclass
+class BotConfiguration:
     # Base values
     token: Optional[str] = getenv("BOT_TOKEN")
     parse_mode: ParseMode = ParseMode.HTML
