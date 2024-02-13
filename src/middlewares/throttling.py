@@ -57,4 +57,4 @@ class ThrottlingMiddleware(BaseMiddleware):
             return None
 
         async with throttling_data.limiter:
-            return await handler(event, data)
+            await handler(event, data)

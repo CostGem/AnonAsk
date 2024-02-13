@@ -1,7 +1,6 @@
 from typing import List
 
-from aiogram import Router, F
-from aiogram.enums import ChatType
+from aiogram import Router
 
 from src.handlers.private import user
 

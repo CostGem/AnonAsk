@@ -5,12 +5,12 @@ from aiogram.filters import CommandStart, CommandObject
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from src.classes.user.user_data import UserData
-from src.database.repositories import PostRepository, CommentRepository, AchievementRepository, StatusRepository
 from src.markups.user.inline.register import get_nickname_set_menu
 from src.markups.user.reply.comment import get_cancel_commenting_keyboard
 from src.markups.user.reply.main_menu import get_main_keyboard
+
+from src.classes.user.user_data import UserData
+from src.database.repositories import PostRepository, CommentRepository, AchievementRepository, StatusRepository
 from src.states import CommentState
 from src.translation.translator import LocalizedTranslator
 from src.utils.service.bot_comands import set_bot_commands

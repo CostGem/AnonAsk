@@ -17,4 +17,4 @@ class DatabaseMiddleware(BaseMiddleware):
         session_pool: async_sessionmaker = data["session_pool"]
         async with session_pool() as session:
             data["session"] = session
-            return await handler(event, data)
+            await handler(event, data)

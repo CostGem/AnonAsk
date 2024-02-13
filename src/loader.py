@@ -1,4 +1,3 @@
-import time
 from contextlib import asynccontextmanager
 
 from aiogram import Bot

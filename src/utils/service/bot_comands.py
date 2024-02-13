@@ -1,4 +1,3 @@
-from aiogram import Bot
 from aiogram.types import BotCommand, Bot
 
 from src.translation.translator import LocalizedTranslator

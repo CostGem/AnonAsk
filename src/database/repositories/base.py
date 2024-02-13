@@ -1,4 +1,3 @@
-import logging
 from typing import Generic, TypeVar, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
