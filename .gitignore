@@ -337,7 +337,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
-
+logs/logs.log
 # Translations
 *.mo
 *.pot

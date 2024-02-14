@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from typing import Optional, List
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -37,10 +37,14 @@ class LocaleRepository(BaseRepository[LocaleModel]):
             select(LocaleModel).where(LocaleModel.code == locale_code)
         )
 
-    async def get_all(self, user: UserModel) -> Sequence[LocaleModel]:
-        """Returns all locales"""
+    async def get_all(self, user: UserModel) -> List[LocaleModel]:
+        """
+        Returns all locales
 
-        if user.locale_id:
+        :param user: User
+        """
+
+        if user and user.locale_id:
             locales = await self.session.scalars(
                 select(LocaleModel).where(LocaleModel.id.not_in(other=[user.locale_id]))
             )
