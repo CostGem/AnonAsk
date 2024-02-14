@@ -15,7 +15,7 @@ class LocaleRepository(BaseRepository[LocaleModel]):
 
         super().__init__(session=session)
 
-    async def get_by_pk(self, locale_id: int) -> Optional[LocaleModel]:
+    async def get_by_id(self, locale_id: int) -> Optional[LocaleModel]:
         """
         Returns a locale by pk
 

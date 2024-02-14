@@ -83,13 +83,19 @@ class BaseCache:
 class JSONCache(BaseCache, Generic[JSONModel, CacheModel]):
     """JSON cache"""
 
+    prefix = "json_cache"
+
     def __init__(self, redis: Redis, item_id: Optional[Union[str, int]] = None, ttl: Optional[int] = None) -> None:
         super().__init__(redis=redis, item_id=item_id, ttl=ttl)
 
-    async def set(self, value: JSONModel) -> None:
+    async def set(self, value: CacheModel) -> None:
         """Set a value as json"""
 
-        await super().set(value=value.to_json())
+        await super().set(
+            value=JSONModel(
+                **CacheModel.__dict__
+            )
+        )
 
     async def get(self) -> Optional[CacheModel]:
         """Get converting model from json cache"""
