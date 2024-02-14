@@ -1,4 +1,3 @@
-from pickle import loads
 from typing import Callable, Dict, Any, Awaitable, Optional
 
 from aiogram import BaseMiddleware

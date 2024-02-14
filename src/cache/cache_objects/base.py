@@ -1,5 +1,6 @@
 import logging
-from typing import Any, List, Union, Optional
+from json import loads
+from typing import Any, List, Union, Optional, TypeVar, Generic
 
 from redis.asyncio.client import Redis
 
@@ -9,6 +10,9 @@ from src.errors.redis import (
     RedisPrefixNotConfiguredError,
     RedisPrefixAlreadyUsedError
 )
+
+JSONModel = TypeVar("JSONModel")
+CacheModel = TypeVar("CacheModel")
 
 
 class BaseCache:
@@ -74,3 +78,27 @@ class BaseCache:
 
         redis_key: str = await self.__get_redis_key()
         await self.__redis.delete(redis_key)
+
+
+class JSONCache(BaseCache, Generic[JSONModel, CacheModel]):
+    """JSON cache"""
+
+    def __init__(self, redis: Redis, item_id: Optional[Union[str, int]] = None, ttl: Optional[int] = None) -> None:
+        super().__init__(redis=redis, item_id=item_id, ttl=ttl)
+
+    async def set(self, value: JSONModel) -> None:
+        """Set a value as json"""
+
+        await super().set(value=value.to_json())
+
+    async def get(self) -> Optional[CacheModel]:
+        """Get converting model from json cache"""
+
+        json_model = await super().get()
+
+        if not json_model:
+            return None
+
+        return CacheModel(
+            **loads(json_model)
+        )
