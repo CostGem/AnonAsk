@@ -6,7 +6,6 @@ from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.cache import LocaleCache
-from src.cache.cache_models import LocaleCacheModel
 from src.classes.user.user_data import UserData
 from src.database.models import UserModel, LocaleModel
 from src.database.repositories import UserRepository, LocaleRepository
@@ -34,7 +33,7 @@ class UserAccountMiddleware(BaseMiddleware):
             if not locale:
                 locale_repository: LocaleRepository = LocaleRepository(session=session)
                 locale: LocaleModel = await locale_repository.get_by_id(locale_id=user.locale_id)
-                await locale_cache.set(value=locale)
+                await locale_cache.set(locale=locale)
 
         data["user_data"] = UserData(
             repository=user_repository,
