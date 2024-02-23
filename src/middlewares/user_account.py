@@ -33,7 +33,7 @@ class UserAccountMiddleware(BaseMiddleware):
             if not locale:
                 locale_repository: LocaleRepository = LocaleRepository(session=session)
                 locale: LocaleModel = await locale_repository.get_by_id(locale_id=user.locale_id)
-                await locale_cache.set(value=locale)
+                await locale_cache.set(locale=locale)
 
         data["user_data"] = UserData(
             repository=user_repository,
