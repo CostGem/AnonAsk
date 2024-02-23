@@ -6,7 +6,6 @@ from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.cache import LocaleCache
-from src.cache.cache_models import LocaleCacheModel
 from src.classes.user.user_data import UserData
 from src.database.models import UserModel, LocaleModel
 from src.database.repositories import UserRepository, LocaleRepository
