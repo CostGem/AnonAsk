@@ -28,8 +28,10 @@ async def bot_webhook(update: dict):
     )
 
 
-def run_webhook() -> None:
+async def run_webhook() -> None:
     """Run webhook server"""
+
+    await on_startup(dispatcher=dp)
 
     uvicorn.run(
         webhook_server_app,
@@ -43,8 +45,11 @@ def run_webhook() -> None:
 async def run_polling() -> None:
     """Start bot polling"""
 
+    await bot.delete_webhook()
+
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
+
     session_pool: async_sessionmaker = await session_manager.get_pool(
         url=CONFIGURATION.DATABASE.build_connection_url()
     )
@@ -64,7 +69,7 @@ def start_bot() -> None:
 
     try:
         if CONFIGURATION.USE_WEBHOOK:
-            run_webhook()
+            asyncio.run(run_webhook())
         else:
             asyncio.run(run_polling())
     except (KeyboardInterrupt, SystemExit, RuntimeError):

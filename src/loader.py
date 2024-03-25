@@ -4,6 +4,9 @@ from aiogram import Bot
 from aiogram import Dispatcher
 from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.types import WebhookInfo
+from apscheduler.executors.asyncio import AsyncIOExecutor
+from apscheduler.jobstores.redis import RedisJobStore
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import FastAPI
 
 from src.cache.redis import redis_instance
@@ -14,7 +17,7 @@ from src.handlers import router
 
 def get_dispatcher():
     """
-    The function `get_dispatcher` creates and configures a `Dispatcher` object for handling requests,
+    Create and configures a dispatcher for handling requests,
     using a Redis storage backend
     """
 
@@ -28,6 +31,23 @@ def get_dispatcher():
     dispatcher.include_router(router)
 
     return dispatcher
+
+
+def get_scheduler() -> AsyncIOScheduler:
+    """Returns a scheduler"""
+
+    scheduler: AsyncIOScheduler = AsyncIOScheduler()
+    scheduler.add_executor(executor=AsyncIOExecutor())
+    scheduler.add_jobstore(
+        jobstore=RedisJobStore(
+            username=CONFIGURATION.REDIS.username,
+            password=CONFIGURATION.REDIS.password,
+            host=CONFIGURATION.REDIS.host,
+            port=CONFIGURATION.REDIS.port
+        )
+    )
+
+    return scheduler
 
 
 @asynccontextmanager
