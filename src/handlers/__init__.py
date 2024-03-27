@@ -2,11 +2,10 @@ from typing import List
 
 from aiogram import Router
 
-from src.handlers import private, channel
+from src.handlers import private
 
 routers: List[Router] = [
-    private.router,
-    channel.router
+    private.router
 ]
 
 router: Router = Router(name="Main router")

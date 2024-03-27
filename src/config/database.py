@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from os import getenv
+from typing import Optional
 
 from sqlalchemy import URL
 
@@ -46,17 +47,29 @@ DATABASES_DRIVERS = {
 
 @dataclass
 class DatabaseConfiguration:
-    host: str = getenv("POSTGRES_HOST")
-    username: str = getenv("POSTGRES_USER")
-    password: str = getenv("POSTGRES_PASSWORD")
-    name: str = getenv("POSTGRES_DB")
-    port: int = int(getenv("POSTGRES_PORT", 5432))
+    host: Optional[str] = None
+    username: Optional[str] = None
+    password: Optional[str] = None
+    name: Optional[str] = None
+    port: int = 5432
 
     database: DatabaseType = DatabaseType.POSTGRESQL
     driver: DatabaseDriver = DatabaseDriver.ASYNCPG
 
     pool_size: int = 10
     echo_mode: bool = True
+
+    def __init__(self) -> None:
+        self.load_from_env()
+
+    def load_from_env(self) -> None:
+        """Load data from env file"""
+
+        self.host = getenv("POSTGRES_HOST")
+        self.username = getenv("POSTGRES_USER")
+        self.password = getenv("POSTGRES_PASSWORD")
+        self.name = getenv("POSTGRES_DB")
+        self.port = int(getenv("POSTGRES_PORT", 5432))
 
     def build_connection_url(self) -> str:
         """Returns a database connection string"""
