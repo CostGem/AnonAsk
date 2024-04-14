@@ -1,1 +1,1 @@
-CREATE DATABASE db;
+CREATE DATABASE newssosh;

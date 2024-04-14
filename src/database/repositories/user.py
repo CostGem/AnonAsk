@@ -18,7 +18,25 @@ class UserRepository(BaseRepository[UserModel]):
     async def register(self, user_id: int, name: str, username: Optional[str] = None) -> UserModel:
         """Register new user if not exists"""
 
-        pass
+        if user := await self.get_by_id(user_id=user_id):
+            await self.session.execute(
+                update(UserModel)
+                .where(UserModel.id == user.id)
+                .values(
+                    name=name,
+                    username=username
+                )
+            )
+        else:
+            user: UserModel = UserModel(
+                user_id=user_id,
+                name=name,
+                username=username
+            )
+
+            self.session.add(instance=UserModel)
+
+        await self.session.commit()
 
     async def get_by_id(self, user_id: int) -> Optional[UserModel]:
         """
@@ -28,7 +46,8 @@ class UserRepository(BaseRepository[UserModel]):
         """
 
         return await self.session.scalar(
-            select(UserModel).where(UserModel.user_id == user_id)
+            select(UserModel)
+            .where(UserModel.user_id == user_id)
         )
 
     async def get_by_pk(self, user_id: int) -> Optional[UserModel]:

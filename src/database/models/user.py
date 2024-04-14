@@ -11,6 +11,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.database.models.base import BaseModel
+from src.enums.role import Role
 
 
 class UserModel(BaseModel):
@@ -20,7 +21,11 @@ class UserModel(BaseModel):
     username: Mapped[str] = mapped_column(String, nullable=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
 
-    locale_id: Mapped[int] = mapped_column(ForeignKey("locales.id"), nullable=False)
+    role_id: Mapped[int] = mapped_column(
+        ForeignKey("roles.id"),
+        nullable=False,
+        default=Role.USER
+    )
 
     is_chat_blocked: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     is_banned: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)

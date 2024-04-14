@@ -4,9 +4,8 @@ from sqlalchemy.orm import Mapped, mapped_column
 from src.database.models.base import BaseModel
 
 
-class LocaleModel(BaseModel):
-    __tablename__ = "locales"
+class RoleModel(BaseModel):
+    __tablename__ = "roles"
 
-    emoji: Mapped[str] = mapped_column(String(5), nullable=False)
+    emoji: Mapped[str] = mapped_column(String, nullable=False)
     name: Mapped[str] = mapped_column(String, nullable=False)
-    code: Mapped[str] = mapped_column(String(5), nullable=False)

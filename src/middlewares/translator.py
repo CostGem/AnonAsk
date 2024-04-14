@@ -1,9 +1,8 @@
-from typing import Callable, Dict, Any, Awaitable, Optional
+from typing import Callable, Dict, Any, Awaitable
 
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 
-from src.database.models import LocaleModel
 from src.translation.translator import LocalizedTranslator, TranslatorManager
 
 
@@ -16,13 +15,7 @@ class TranslatorMiddleware(BaseMiddleware):
             event: TelegramObject,
             data: Dict[str, Any],
     ) -> Any:
-        locale: Optional[LocaleModel] = data.get("locale")
-
-        locale_code: str = locale.code if locale else "ru"
-
-        translator: LocalizedTranslator = TranslatorManager().get_translator(
-            locale=locale_code
-        )
+        translator: LocalizedTranslator = TranslatorManager().get_translator(locale="ru")
 
         data["translator"] = translator
 

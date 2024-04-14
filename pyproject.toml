@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "Aiogram Template"
+name = "News sosh bot"
 version = "0.1.0"
 description = ""
 authors = ["CostGem"]
