@@ -45,6 +45,17 @@ async def send_anonim_message(
         )
         return
 
+    if user_id == message.from_user.id:
+        await state.clear()
+
+        await message.answer(
+            text=translator.get(
+                key="welcome_message",
+                link=await get_anonim_link(user_id=message.from_user.id)
+            )
+        )
+        return
+
     user: Optional[UserModel] = await user_data.repository.get_by_id(user_id=user_id)
 
     if user and user.is_chat_blocked:
