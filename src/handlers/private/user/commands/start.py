@@ -40,6 +40,8 @@ async def anonim_message_start(
         translator: LocalizedTranslator,
         user_data: UserData
 ) -> None:
+    await state.clear()
+
     try:
         decoded_args: str = decode_payload(payload=command.args)
     except Exception as ex:
