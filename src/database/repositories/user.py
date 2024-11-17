@@ -1,22 +1,24 @@
 from typing import Optional
 
 from sqlalchemy import select, update
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database.models import UserModel
-from src.database.repositories.base import BaseRepository
+from src.database.repositories.abstract import AbstractRepository
 
 
-class UserRepository(BaseRepository[UserModel]):
+class UserRepository(AbstractRepository[UserModel]):
     """User repository"""
 
-    def __init__(self, session: AsyncSession):
-        """Initialize user repository"""
-
-        super().__init__(session=session)
+    type_model = UserModel
 
     async def register(self, user_id: int, name: str, username: Optional[str] = None) -> UserModel:
-        """Register new user if not exists"""
+        """
+        Register new user if not exists
+
+        :param user_id: User ID
+        :param name: User name
+        :param username: Username
+        """
 
         if user := await self.get_by_id(user_id=user_id):
             await self.session.execute(
@@ -34,9 +36,11 @@ class UserRepository(BaseRepository[UserModel]):
                 username=username
             )
 
-            self.session.add(instance=UserModel)
+            self.session.add(instance=user)
 
         await self.session.commit()
+
+        return user
 
     async def get_by_id(self, user_id: int) -> Optional[UserModel]:
         """
@@ -50,29 +54,17 @@ class UserRepository(BaseRepository[UserModel]):
             .where(UserModel.user_id == user_id)
         )
 
-    async def get_by_pk(self, user_id: int) -> Optional[UserModel]:
+    async def set_chat_blocked(self, user: UserModel, chat_blocked: bool) -> None:
         """
-        Returns a user by pk
-
-        :param user_id: User pk
-        """
-
-        return await self.session.scalar(
-            select(UserModel).where(UserModel.id == user_id)
-        )
-
-    async def update_chat_blocked(self, user: UserModel, chat_blocked: bool) -> None:
-        """
-        Update is_chat_blocked status for user
+        Set is_chat_blocked for user
 
         :param user: User
-        :param chat_blocked: Chat blocked status
+        :param chat_blocked: Chat blocked
         """
 
         await self.session.execute(
-            update(
-                table=UserModel
-            ).where(
+            update(UserModel)
+            .where(
                 UserModel.id == user.id
             ).values(
                 is_chat_blocked=chat_blocked

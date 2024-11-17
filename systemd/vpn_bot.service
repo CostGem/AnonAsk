@@ -1,5 +1,5 @@
 [Unit]
-Description=<< Type there description >>
+Description=School helper bot
 Requires=docker.service
 After=docker.service
 

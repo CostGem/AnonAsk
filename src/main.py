@@ -1,80 +1,50 @@
 import asyncio
+from contextlib import suppress
 
-import uvicorn
-from aiogram.types import Update
+from aiogram import Dispatcher, Bot
+from dependency_injector.wiring import Provide, inject
+from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from src.cache.redis import redis_instance
 from src.config import CONFIGURATION
-from src.database.engine import session_manager
-from src.dispatcher_actions import on_shutdown, on_startup
-from src.loader import bot, dp, webhook_server_app
+from src.containers.app import AppContainer
+from src.database.engine import SessionMakerManager
+from src.loader import on_shutdown, on_startup
 
 
-@webhook_server_app.post(CONFIGURATION.BOT.webhook_endpoint)
-async def bot_webhook(update: dict):
-    """Bot webhook endpoint"""
-
-    update: Update = Update.model_validate(update, context={"bot": bot})
-    session_pool: async_sessionmaker = await session_manager.get_pool(
-        url=CONFIGURATION.DATABASE.build_connection_url()
-    )
-
-    await dp.feed_update(
-        bot,
-        update,
-        session_pool=session_pool,
-        redis=redis_instance,
-    )
-
-
-async def run_webhook() -> None:
-    """Run webhook server"""
-
-    await on_startup(dispatcher=dp)
-
-    uvicorn.run(
-        webhook_server_app,
-        host=CONFIGURATION.BOT.webhook_host,
-        port=CONFIGURATION.BOT.webhook_port,
-        reload=False,
-        log_level="debug" if CONFIGURATION.IS_DEVELOPMENT else "info",
-    )
-
-
-async def run_polling() -> None:
+@inject
+async def run_polling(
+        dp: Dispatcher = Provide[AppContainer.dp],
+        redis: Redis = Provide[AppContainer.redis],
+        bot: Bot = Provide[AppContainer.bot],
+        session_manager: SessionMakerManager = Provide[AppContainer.session_manager]
+) -> None:
     """Start bot polling"""
 
-    await bot.delete_webhook()
+    with suppress(Exception):
+        await bot.delete_webhook(drop_pending_updates=True)
 
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
 
     session_pool: async_sessionmaker = await session_manager.get_pool(
-        url=CONFIGURATION.DATABASE.build_connection_url()
+        url=CONFIGURATION.DATABASE.connection_url
     )
-
-    if not CONFIGURATION.IS_DEVELOPMENT:
-        await bot.delete_webhook(drop_pending_updates=True)
 
     await dp.start_polling(
         bot,
         session_pool=session_pool,
-        redis=redis_instance,
+        redis=redis
     )
 
 
 def start_bot() -> None:
-    """Start the bot with polling or webhook"""
+    """Start the bot with polling"""
+
+    container: AppContainer = AppContainer()
+    container.init_resources()
 
     try:
-        if CONFIGURATION.USE_WEBHOOK:
-            asyncio.run(run_webhook())
-        else:
-            asyncio.run(run_polling())
+        asyncio.run(run_polling())
     except (KeyboardInterrupt, SystemExit, RuntimeError):
         pass
-
-
-if __name__ == "__main__":
-    start_bot()

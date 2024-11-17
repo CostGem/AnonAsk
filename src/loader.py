@@ -1,78 +1,120 @@
-from contextlib import asynccontextmanager
+import logging
 
 from aiogram import Bot
 from aiogram import Dispatcher
-from aiogram.fsm.storage.redis import RedisStorage
-from aiogram.types import WebhookInfo
 from apscheduler.executors.asyncio import AsyncIOExecutor
 from apscheduler.jobstores.redis import RedisJobStore
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from fastapi import FastAPI
+from dependency_injector.wiring import inject, Provide
 
-from src.cache.redis import redis_instance
 from src.config import CONFIGURATION
-from src.dispatcher_actions import on_shutdown
+from src.containers.app import AppContainer
 from src.handlers import router
+from src.middlewares import (
+    ThrottlingMiddleware,
+    DatabaseMiddleware,
+    UserAccountMiddleware,
+    TranslatorMiddleware
+)
+from src.utils.service.logger import configure_logging
 
 
-def get_dispatcher():
+@inject
+def set_dispatcher_injections(dp: Dispatcher = Provide[AppContainer.dp]) -> None:
     """
-    Create and configures a dispatcher for handling requests,
-    using a Redis storage backend
+    Create and configures a dispatcher for handling requests, using a Redis storage backend
+
+    :param dp: Dispatcher
     """
 
-    redis_storage = RedisStorage(
-        redis=redis_instance,
-        state_ttl=CONFIGURATION.REDIS.state_ttl,
-        data_ttl=CONFIGURATION.REDIS.data_ttl,
-    )
+    scheduler: AsyncIOScheduler = get_scheduler()
 
-    dispatcher: Dispatcher = Dispatcher(storage=redis_storage)
-    dispatcher.include_router(router)
+    dp["scheduler"] = scheduler
 
-    return dispatcher
+    dp.include_router(router=router)
 
 
-def get_scheduler() -> AsyncIOScheduler:
+@inject
+def get_scheduler(scheduler: AsyncIOScheduler = Provide[AppContainer.scheduler]) -> AsyncIOScheduler:
     """Returns a scheduler"""
 
-    scheduler: AsyncIOScheduler = AsyncIOScheduler()
     scheduler.add_executor(executor=AsyncIOExecutor())
+
     scheduler.add_jobstore(
         jobstore=RedisJobStore(
-            username=CONFIGURATION.REDIS.username,
-            password=CONFIGURATION.REDIS.password,
-            host=CONFIGURATION.REDIS.host,
-            port=CONFIGURATION.REDIS.port
+            username=CONFIGURATION.REDIS.USER,
+            password=CONFIGURATION.REDIS.PASSWORD,
+            host=CONFIGURATION.REDIS.HOST,
+            port=CONFIGURATION.REDIS.PORT,
         )
     )
+
+    logging.getLogger("apscheduler").setLevel(logging.ERROR)
 
     return scheduler
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    webhook_info: WebhookInfo = await bot.get_webhook_info()
+@inject
+def register_middlewares(dp: Dispatcher = Provide[AppContainer.dp]) -> None:
+    """
+    Registers middlewares
 
-    if webhook_info.url != CONFIGURATION.BOT.webhook_url:
-        await bot.set_webhook(url=CONFIGURATION.BOT.webhook_url)
-    else:
-        await bot.delete_webhook(drop_pending_updates=True)
-        # time.sleep(1)
-        await bot.set_webhook(url=CONFIGURATION.BOT.webhook_url)
+    :param dp: Dispatcher
+    """
 
-    yield
-    await on_shutdown(bot=bot, dispatcher=dp)
+    # Throttling
+    dp.message.outer_middleware(ThrottlingMiddleware())
+    dp.callback_query.outer_middleware(ThrottlingMiddleware())
+
+    # Database
+    dp.message.outer_middleware(DatabaseMiddleware())
+    dp.callback_query.outer_middleware(DatabaseMiddleware())
+    dp.my_chat_member.outer_middleware(DatabaseMiddleware())
+
+    # User
+    dp.message.outer_middleware(UserAccountMiddleware())
+    dp.callback_query.outer_middleware(UserAccountMiddleware())
+    dp.my_chat_member.outer_middleware(UserAccountMiddleware())
+
+    # Translator
+    dp.message.outer_middleware(TranslatorMiddleware())
+    dp.callback_query.outer_middleware(TranslatorMiddleware())
 
 
-bot: Bot = Bot(
-    token=CONFIGURATION.BOT.token,
-    session=CONFIGURATION.BOT.session,
-    parse_mode=CONFIGURATION.BOT.parse_mode,
-    disable_web_page_preview=CONFIGURATION.BOT.disable_web_page_preview,
-    protect_content=CONFIGURATION.BOT.protect_content,
-)
+@inject
+async def on_startup(dispatcher: Dispatcher = Provide[AppContainer.dp]) -> None:
+    """
+    On bot startup
 
-dp: Dispatcher = get_dispatcher()
+    :param dispatcher: Dispatcher
+    """
 
-webhook_server_app: FastAPI = FastAPI(lifespan=lifespan)
+    configure_logging()
+
+    set_dispatcher_injections()
+
+    register_middlewares()
+
+    scheduler: AsyncIOScheduler = dispatcher["scheduler"]
+
+    scheduler.start()
+
+    logging.debug("Bot started")
+
+
+@inject
+async def on_shutdown(
+        dispatcher: Dispatcher = Provide[AppContainer.dp],
+        bot: Bot = Provide[AppContainer.bot]
+) -> None:
+    """
+    On bot shutdown
+
+    :param dispatcher: Dispatcher
+    :param bot: Bot instance
+    """
+
+    await bot.session.close()
+    await dispatcher.storage.close()
+
+    logging.debug("Bot stopped")

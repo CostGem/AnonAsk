@@ -7,7 +7,7 @@ from aiogram import BaseMiddleware
 from aiogram.types import Message, TelegramObject
 from cachetools import TTLCache
 
-from src.classes.types.album import Album, Media
+from src.types.album import Album, Media
 
 DEFAULT_LATENCY = 0.2
 DEFAULT_TTL = 0.3

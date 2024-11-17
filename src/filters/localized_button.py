@@ -16,7 +16,7 @@ class LocalizedButtonFilter(BaseFilter):
         self.__translation_key = key
         self.__translations = {}
 
-    def __call__(self, message: Message, translator: LocalizedTranslator) -> Union[bool, Dict[str, Any]]:
+    async def __call__(self, message: Message, translator: LocalizedTranslator) -> Union[bool, Dict[str, Any]]:
         button_translated_text: Optional[str] = self.__translations.get(self.__translation_key)
 
         if not button_translated_text:
